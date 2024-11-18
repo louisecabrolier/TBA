@@ -25,9 +25,9 @@ class Game:
         self.commands["help"] = help
         quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
         self.commands["quit"] = quit
-        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O)", Actions.go, 1)
+        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O) et de haut en bas (U, D)", Actions.go, 1)
         self.commands["go"] = go
-        
+
         # Setup rooms
 
         forest = Room("Forest", "dans une forêt enchantée. Vous entendez une brise légère à travers la cime des arbres.")
@@ -42,15 +42,22 @@ class Game:
         self.rooms.append(swamp)
         castle = Room("Castle", "dans un énorme château fort avec des douves et un pont levis. Sur les tours, des flèches en or massif.")
         self.rooms.append(castle)
+        dungeon = Room("Dungeon", "vous vous retrouvez au donjon")
+        self.rooms.append(dungeon)
+        moat = Room("Moat", "vous êtes tombés dans les douves du château")
+        self.rooms.append(moat)
 
         # Create exits for rooms
 
-        forest.exits = {"N" : cave, "E" : tower, "S" : castle, "O" : None}
-        tower.exits = {"N" : cottage, "E" : None, "S" : swamp, "O" : forest}
-        cave.exits = {"N" : None, "E" : cottage, "S" : forest, "O" : None}
+        forest.exits = {"N" : cave, "E" : None, "S" : castle, "O" : None, "D" : dungeon} #E : tower
+        tower.exits = {"N" : cottage, "E" : None, "S" : None, "O" : None} #O : forest et S : swamp
+        cave.exits = {"N" : None, "E" : cottage, "S" : forest, "O" : None, "U" : dungeon}
         cottage.exits = {"N" : None, "E" : None, "S" : tower, "O" : cave}
-        swamp.exits = {"N" : tower, "E" : None, "S" : None, "O" : castle}
-        castle.exits = {"N" : forest, "E" : swamp, "S" : None, "O" : None}
+        swamp.exits = {"N" : tower, "E" : None, "S" : None, "O" : None}
+        castle.exits = {"N" : forest, "E" : swamp, "S" : None, "O" : None, "D": moat}
+        dungeon.exits = {"U" : forest, "D" : cave , "N" : moat}
+        moat.exits = {"U" : castle, "S" : dungeon}
+
 
         # Setup player and starting room
 
@@ -67,21 +74,48 @@ class Game:
             self.process_command(input("> "))
         return None
 
-    # Process the command entered by the player
     def process_command(self, command_string) -> None:
-
-        # Split the command string into a list of words
+    # Remove spaces before and after
+        command_string = command_string.strip()
+    
+    # If the command is empty, do nothing
+        if command_string == "":
+            return
+    
+    # Split the command string into a list of words
         list_of_words = command_string.split(" ")
-
         command_word = list_of_words[0]
-
-        # If the command is not recognized, print an error message
-        if command_word not in self.commands.keys():
-            print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
-        # If the command is recognized, execute it
-        else:
+    
+    # Handle 'go' command specifically
+        if command_word == "go":
+        # Check if direction is provided
+            if len(list_of_words) < 2:
+                print("\nVeuillez spécifier une direction.\n")
+                return
+        
+        # Get the direction
+            direction = list_of_words[1]
+        
+        # Valid directions
+            valid_directions = ["N", "S", "E", "O", "D", "U"]
+        
+        # Validate direction
+            if direction not in valid_directions:
+                print(f"\nDirection '{direction}' non reconnue.\n")
+                return
+        
+        # Execute go command
+            command = self.commands["go"]
+            command.action(self, list_of_words, command.number_of_parameters)
+    
+    # Handle other recognized commands
+        elif command_word in self.commands.keys():
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
+    
+    # Handle unrecognized commands
+        else:
+            print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
 
     # Print the welcome message
     def print_welcome(self):
