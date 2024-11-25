@@ -51,3 +51,4 @@ class Player():
             return "\n".join(nomsendroits)
         else:
             return "Aucune pièce visitée"
+

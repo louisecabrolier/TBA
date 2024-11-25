@@ -79,7 +79,7 @@ class Game:
 
         # Setup player and starting room
         self.player = Player(input("\nEntrez votre nom: "))
-        self.player.current_room = foret  # Changed this line to start in the forest
+        self.player.current_room = foret 
 
     # Play the game
     def play(self):
