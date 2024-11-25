@@ -137,3 +137,37 @@ class Actions:
             print("\t- " + str(command))
         print()
         return True
+    
+
+    def back(game, list_of_words, number_of_parameters):
+        """
+        Move the player back to the previous position.
+        
+        Args:
+            game (Game): The game object.
+            list_of_words (list): The list of words in the command.
+            number_of_parameters (int): The number of parameters expected by the command.
+
+        Returns:
+            bool: True if the command was executed successfully, False otherwise.
+        """
+
+        player = game.player
+        l = len(list_of_words)
+        
+        # If the number of parameters is incorrect, print an error message and return False.
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+
+        # Check if there is a previous position to return to.
+        if not game.history:
+            print("Vous ne pouvez pas revenir en arrière, aucun déplacement précédent enregistré.")
+            return False
+
+        # Pop the last position from the history and move the player back.
+        previous_position = game.history.pop()
+        player.position = previous_position
+        print(f"Vous êtes revenu à votre position précédente : {player.position}")
+        return True
