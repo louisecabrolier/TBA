@@ -1,5 +1,7 @@
 # Define the Player class.
 from room import Room
+from inventory import Inventory
+
 class Player():
 
 
@@ -10,8 +12,8 @@ class Player():
         self.name = name
         self.current_room = None
         self.history = []
-        self.inventory = {}
-        self.max_weight = 10  # Poids maximum en kg
+        self.inventory = Inventory()
+        self.max_poids = 10  # Poids maximum en kg
 
 
     # Define the move method.
@@ -60,19 +62,34 @@ class Player():
             return "Aucune pièce visitée"
 
 
-    def get_inventory(self):
-            if not self.inventory:
-                return "Votre inventaire est vide.\n"
+    #def get_inventory(self):
+            #if not self.inventory:
+                #return "Votre inventaire est vide.\n"
                
-            message = "Vous disposez des items suivants :\n"
-            for name, item in self.inventory.items():
-                message += f"    - {name} : {item.description} ({item.poids} kg)\n"
-            return message
+            #message = "Vous disposez des items suivants :\n"
+            #for name, item in self.inventory.items():
+                #message += f"    - {name} : {item.description} ({item.poids} kg)\n"
+            #return message
 
 
+    def get_inventory(self):
+        """
+        Récupère l'inventaire du joueur.
 
+        :return: Chaîne de caractères listant les items.
+        """
+        return self.inventory
 
     def get_current_weight(self): #pr pas que l'inventaire nait une val maximum a 10kg
-        return sum(item.poids for item in self.inventory.values())
+        return sum(item.poids for item in self.inventory.items.values())
 
+
+    def check(self):
+        """ Affiche le contenu de l'inventaire du joueur """
+        if not self.inventory.items:
+            print("Votre inventaire est vide")
+        else:
+            print("Votre inventaire contient :")
+            for item_name, item in self.inventory.items.items():
+                print(f"- {item_name}: {item.description} ({item.poids} kg)")
 

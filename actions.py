@@ -25,7 +25,10 @@ MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 
 
+import inventory
 import room
+
+
 class Actions:
 
 
@@ -348,34 +351,40 @@ class Actions:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
-       
-        return game.player.current_room.get_inventory()
-   
+
+    # Récupérer l'inventaire de la pièce actuelle
+        current_room = game.player.current_room
+        print(current_room.get_inventory())  # Appel à la méthode de la classe Room
+        return True
+
 
 
     def take(game, list_of_words, number_of_parameters):
-        if len(list_of_words) < 2:
+        if len(list_of_words) == 1:
             print("Que voulez-vous prendre ?")
+            return False
+        
+        item_name = list_of_words[1]
+        current_room = game.player.current_room
+        
+        # Vérifier si l'item existe dans l'inventaire de la pièce
+        if item_name in current_room.inventory.items:
+            item = current_room.inventory.items[item_name]  # Récupérer l'item de la pièce
+            if game.player.get_current_weight() + item.poids > game.player.max_poids:
+                print(f"Vous ne pouvez pas prendre '{item_name}'. Vous dépassez la limite de poids autorisée ({game.player.max_poids} kg).")
+                return
+            else: 
+                # Ajouter l'item à l'inventaire du joueur en utilisant get_inventory
+                game.player.get_inventory().add_item(item)  # Ajout dans l'inventaire du joueur
+                current_room.inventory.remove_item(item_name)  # Retirer l'item de l'inventaire de la pièce
+                print(f"Vous avez pris l'objet '{item_name}'.")
+                return True
         else:
-            item_name = list_of_words[1]
-            current_room = game.player.current_room
-           
-            item_to_take = None
-            for item in current_room.inventory:
-                if item.name == item_name:
-                    item_to_take = item
-                    break
-                   
-            if item_to_take:
-                new_weight = game.player.get_current_weight() + item_to_take.poids
-                if new_weight > game.player.max_weight:
-                    print(f"Cet objet est trop lourd. Poids max: {game.player.max_weight}kg, actuel: {game.player.get_current_weight()}kg")
-                else:
-                    game.player.inventory[item_name] = item_to_take
-                    current_room.inventory.remove(item_to_take)
-                    print(f"Vous avez pris l'objet '{item_name}'")
-            else:
-                print(f"Il n'y a pas de '{item_name}' ici.")
+            print(f"L'item '{item_name}' n'est pas présent dans la pièce.")
+            return False
+
+
+
 
 
     def drop(game, list_of_words, number_of_parameters):
@@ -386,61 +395,77 @@ class Actions:
             player = game.player
            
             # Chercher l'item dans l'inventaire du joueur
-            item_to_drop = player.inventory.get(item_name)
+            if item_name in player.inventory.items:
+                item_to_drop = player.inventory.items[item_name]
            
-            if item_to_drop:
                 # Retirer du dict du joueur
-                del player.inventory[item_name]
+                del player.inventory.items[item_name]
                 # Ajouter au set de la pièce
-                player.current_room.inventory.add(item_to_drop)
+                player.current_room.inventory.add_item(item_to_drop)
                 print(f"Vous avez déposé l'objet '{item_name}'")
             else:
                 print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
 
 
 
-
     def check(game, list_of_words, number_of_parameters):
-        inventory = game.player.inventory
-        if not inventory:
-            print("Votre inventaire est vide.")
+        """ Affiche le contenu de l'inventaire du joueur """
+        if len(list_of_words) == 1:  # Si seul le mot 'check' est présent
+            game.player.check()  # Appelle la méthode check() du joueur
         else:
-            print("Votre inventaire contient :")
-            for name, item in inventory.items():
-                print(f"- {item.name} : {item.description} ({item.poids} kg)")
+            print("Commande incorrecte. Utilisez simplement 'check' pour voir votre inventaire.")
 
+    
 
     def charge(game, list_of_words, number_of_parameters):
-        if len(list_of_words)!= number_of_parameters +1:
-            command_word = list_of_words[0]
-            print(MSG1.format(command_word=command_word))
-            return False
+        player = game.player
+        beamer = player.inventory.get("beamer")
+        if not beamer:
+            print("Vous ne posséder pas de beamer pour le charger.")
+            return
+        
+        beamer.charge(player.current_room)
+    
+        #if len(list_of_words)!= number_of_parameters +1:
+            #command_word = list_of_words[0]
+            #print(MSG1.format(command_word=command_word))
+            #return False
        
-        item_name = list_of_words[1]
-        item = game.player.inventory.get(item_name, None)
+        #item_name = list_of_words[1]
+        #item = game.player.inventory.get(item_name, None)
        
-        print(item_name)
-        if item_name in game.player.inventory:
-            item[2].charge(game.player.current_room)
-            return True
-        else:
-            print(f"L'objet '{item_name}' ne peut pas être chargé ou n'est pas un beamer")
-            return False
-
+        #print(item_name)
+        #if item_name in game.player.inventory:
+            #item[2].charge(game.player.current_room)
+            #return True
+        #else:
+            #print(f"L'objet '{item_name}' ne peut pas être chargé ou n'est pas un beamer")
+            #return False
 
     def teleporte(game, list_of_words, number_of_parameters):
-        if len(list_of_words)!= number_of_parameters +1:
-            command_word = list_of_words[0]
-            print(MSG1.format(command_word=command_word))
-            return False
+            player = game.player
+            beamer = player.inventory.get("beamer")
+
+            if not beamer:
+                print("Vous ne possédez pas de beamer pour l'utiliser.")
+                return
+
+            beamer.teleporte(player)
+
+
+    #def teleporte(game, list_of_words, number_of_parameters):
+        #if len(list_of_words)!= number_of_parameters +1:
+            #command_word = list_of_words[0]
+            #print(MSG1.format(command_word=command_word))
+            #return False
        
-        item_name = list_of_words[1]
-        item = game.player.inventory.get(item_name, None)
+        #item_name = list_of_words[1]
+        #item = game.player.inventory.get(item_name, None)
 
 
-        if item_name in game.player.inventory:
-            if isinstance(item[2],Beamer):
-                return item[2].use(game)
-            else:
-                print(f"L'objet '{item_name}' ne peut pas vous téléporter ou n'est pas un beamer")
-                return False
+        #if item_name in game.player.inventory:
+            #if isinstance(item[2],Beamer):
+                #return item[2].use(game)
+            #else:
+                #print(f"L'objet '{item_name}' ne peut pas vous téléporter ou n'est pas un beamer")
+                #return False

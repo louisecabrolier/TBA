@@ -1,4 +1,6 @@
+from inventory import Inventory
 class Room:
+
 
 
     # Define the constructor.
@@ -6,7 +8,8 @@ class Room:
         self.name = name
         self.description = description
         self.exits = {}
-        self.inventory = set([])
+        self.inventory = Inventory()
+        self.characters = []
    
     # Define the get_exit method.
     def get_exit(self, direction):
@@ -27,13 +30,27 @@ class Room:
         exit_string = exit_string.strip(", ")
         return exit_string
  
+    #def get_inventory(self):
+    #   inventory = []
+        # Ajouter les items
+    #   for item in self.items:
+    #        inventory.append(f"- {item.name} : {item.description}")
+
+        # Ajouter les personnages non joueurs
+    #    for character in self.characters:
+    #        inventory.append(f"- {character.name} : {character.description}")
+
+        # Construire la sortie
+     #   return "On voit:\n" + "\n".join(inventory) if inventory else "Il n'y a rien ici."
+
+
     def get_inventory(self):
-        if len(self.inventory)>=1:
-            print("\nLa pièce contient :")
-            for v in self.inventory:
-                print(f" - {v.name} : {v.description} ({v.poids} kg")
-        else:
-            print("\n Il n'y a rien ici.")
+        """
+        Récupère l'inventaire de la pièce.
+
+        :return: Chaîne de caractères listant les items.
+        """
+        return self.inventory.get_inventory()
 
 
     def get_long_description(self):

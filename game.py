@@ -9,6 +9,8 @@ from player import Player
 from command import Command
 from actions import Actions
 from item import Item
+from character import Character
+from beamer import Beamer
 
 
 class Game:
@@ -22,6 +24,7 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
+        self.characters = []
        
 
 
@@ -120,23 +123,44 @@ class Game:
 
         self.foret = foret  # Store room as instance attribute
         self.entreecite = entreecite
+        self.carnaval = carnaval
 
 
         shield = Item("shield", "un bouclier léger et résistant", 5)
         helmet = Item("helmet", "un casque en métal", 6)
         branche = Item("branche", "une branche d'arbre", 1)
-        beamer = Item("beamer", "un objet magique de téléportation", 1)
+        potion = Item("potion", "une potion magique qui va t'aider", 1)
+        beamer = Beamer("beamer", "un objet magique qui permet la téléportation", 1)
 
 
+        # Ajout des items à l'inventaire des lieux directement via le dictionnaire
+        foret.inventory["shield"] = shield
+        foret.inventory["helmet"] = helmet
+        entreecite.inventory["branche"] = branche
+        foret.inventory["beamer"] = beamer
+        carnaval.inventory["potion"] = potion
 
+     
 
-        foret.inventory.add(shield)
-        foret.inventory.add(helmet)
-        entreecite.inventory.add(branche)
-        foret.inventory.add(beamer)
+        #PNJ
 
+        # Création des personnages
 
+        bouffon = Character("Bouffon", "Le bouffon du roi", carnaval, ["J'ai quelque chose pour toi."])
+        medecin = Character("Médecin", "Un médecin random", carnaval, ["J'ai quelque chose pour t'aider dans ta quête"])
+        vendeuse = Character("Vendeuse", "Une vendeuse s'approche pour te parler", carnaval, ["T'as fait tes affaires"])
+        annonceur = Character("Annonceur", "Un annonceur arrive sur la place du Carnaval", carnaval, ["Infection ! Il faut se réfugier au château"])
 
+        # Liste des personnages pour le jeu
+
+        self.characters = [bouffon, medecin, vendeuse, annonceur]
+
+        #Ajout des personnages aux lieux
+
+        carnaval.characters.append(bouffon)
+        carnaval.characters.append(medecin)
+        carnaval.characters.append(vendeuse)
+        carnaval.characters.append(annonceur)
 
     # Play the game
     def play(self):
@@ -178,8 +202,7 @@ class Game:
                 print ("\n Veuillez spécifier une direction.\n")
                 return
 
-
-
+        
 
             # crea du set des directions possibles
             directions_values = {"N", "S", "E", "O", "U", "D"}
@@ -230,8 +253,6 @@ class Game:
         print("Entrez 'help' si vous avez besoin d'aide.")
         print(self.player.current_room.get_long_description())
    
-
-
 
 
 def main():
