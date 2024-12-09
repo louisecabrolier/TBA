@@ -38,9 +38,6 @@ class Player():
         #print("Vous avez déjà visité les pièces suivantes :\n", self.get_history())
         return True
    
-       
-
-
 
 
      # Méthode pour revenir en arrière
@@ -55,14 +52,21 @@ class Player():
         print(self.current_room.get_long_description())
         return True
        
-   
+    def get_history(self) :
+        nomsendroits = [room.name for room in self.history]
+        if nomsendroits:
+            return "\n".join(nomsendroits)
+        else:
+            return "Aucune pièce visitée"
+
+
     def get_inventory(self):
             if not self.inventory:
                 return "Votre inventaire est vide.\n"
                
             message = "Vous disposez des items suivants :\n"
             for name, item in self.inventory.items():
-                message += f"    - {name} : {item.description} ({item.weight} kg)\n"
+                message += f"    - {name} : {item.description} ({item.poids} kg)\n"
             return message
 
 

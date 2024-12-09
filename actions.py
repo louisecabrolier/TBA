@@ -1,5 +1,7 @@
 
 
+
+
 # The actions module contains the functions that are called when a command is executed.
 # Each function takes 3 parameters:
 # - game: the game object
@@ -331,11 +333,15 @@ class Actions:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
-       
+        
+        # Utilisation du player directement depuis l'objet game
+        print("\nVotre inventaire :")
+        print(game.player.get_inventory())
+        
         # Affichage de l'inventaire
-        print(player.get_inventory())
-        print(current_room.get_inventory())
-        return True
+        #print(player.get_inventory())
+        #print(current_room.get_inventory())
+        #return True
    
     def look(game, list_of_words, number_of_parameters):
         if len(list_of_words) != number_of_parameters +1:
@@ -438,5 +444,3 @@ class Actions:
             else:
                 print(f"L'objet '{item_name}' ne peut pas vous téléporter ou n'est pas un beamer")
                 return False
-
-
