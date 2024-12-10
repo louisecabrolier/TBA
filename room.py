@@ -66,3 +66,10 @@ class Room:
 
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+
+    def add_adjacent_room(self, room):
+        """Ajouter une pièce voisine"""
+        if room not in self.adjacent_rooms:
+            self.adjacent_rooms.append(room)
+
+            

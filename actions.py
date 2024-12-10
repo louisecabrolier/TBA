@@ -357,7 +357,7 @@ class Actions:
         current_room = game.player.current_room
 
         # Afficher la pièce sans répétition du nom
-        print(f"Vous êtes dans {current_room.name}. {current_room.description}")
+        print(f"Vous êtes dans {current_room.name}")
 
         # Afficher l'inventaire de la pièce (objets et PNJ)
         print(current_room.inventory.get_inventory())  # Utilisation de la méthode get_inventory pour afficher

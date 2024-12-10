@@ -11,6 +11,7 @@ from actions import Actions
 from item import Item
 from character import Character
 from beamer import Beamer
+from config import DEBUG
 
 
 class Game:
@@ -178,14 +179,31 @@ class Game:
 
     
 
-    # Play the game
     def play(self):
         self.setup()
         self.print_welcome()
+
         # Loop until the game is finished
         while not self.finished:
-            # Get the command from the player
+            # Process player command
             self.process_command(input("> "))
+
+            # Déplacer tous les PNJ dans la salle actuelle à chaque tour
+            if DEBUG:
+                print("DEBUG: Début du déplacement des PNJ.")
+            
+            # Récupérer tous les PNJ dans la salle actuelle du joueur
+            for npc in self.player.current_room.get_inventory().npcs.values():  # Utilisation de get_inventory()
+                if npc.move():  # Si le PNJ se déplace
+                    if DEBUG:
+                        print(f"DEBUG: {npc.name} s'est déplacé dans la salle {npc.current_room.name}.")
+                else:
+                    if DEBUG:
+                        print(f"DEBUG: {npc.name} reste dans la salle {npc.current_room.name}.")
+            
+            if DEBUG:
+                print("DEBUG: Fin du déplacement des PNJ.")
+
         return None
 
 
@@ -205,11 +223,12 @@ class Game:
 
 
 
-
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
         command_word = list_of_words[0]
 
+        if DEBUG:
+            print(f"DEBUG: Liste des mots de la commande: {list_of_words}")
 
 
 
