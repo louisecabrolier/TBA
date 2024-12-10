@@ -9,7 +9,7 @@ class Room:
         self.description = description
         self.exits = {}
         self.inventory = Inventory()
-        self.characters = []
+        self.characters = {}
    
     # Define the get_exit method.
     def get_exit(self, direction):
@@ -50,8 +50,20 @@ class Room:
 
         :return: Chaîne de caractères listant les items.
         """
-        return self.inventory.get_inventory()
+        return self.inventory
+        #return self.inventory.get_inventory()
+       # output = "On voit :"
+        #if self.inventory:
+            #for name, item in self.inventory.items():
+                #output += f"\n    - {name} : {item.description}"
+        #if self.characters:
+            #for name, character in self.characters.items():
+                #output += f"\n    - {name} : {character.description}"
+        #if not self.inventory and not self.characters:
+            #output += "\n    Il n'y a rien ici."
+        #return output
 
 
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+

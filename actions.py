@@ -27,6 +27,7 @@ MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 
 import inventory
 import room
+from beamer import Beamer
 
 
 class Actions:
@@ -347,16 +348,26 @@ class Actions:
         #return True
    
     def look(game, list_of_words, number_of_parameters):
-        if len(list_of_words) != number_of_parameters +1:
+        if len(list_of_words) != number_of_parameters + 1:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
 
-    # Récupérer l'inventaire de la pièce actuelle
+        # Récupérer l'inventaire de la pièce actuelle
         current_room = game.player.current_room
-        print(current_room.get_inventory())  # Appel à la méthode de la classe Room
+        inventory = current_room.get_inventory()  # Appel à la méthode de la classe Room
+
+        if hasattr(inventory, 'items'):  # Vérifie si l'inventaire possède un attribut 'items'
+            print("Voici ce qu'il y a dans ce lieu :", ', '.join(str(item) for item in inventory.items))
+        else:
+            print("Impossible d'afficher l'inventaire : format inconnu.")
+
         return True
 
+
+
+
+      
 
 
     def take(game, list_of_words, number_of_parameters):
@@ -378,6 +389,9 @@ class Actions:
                 game.player.get_inventory().add_item(item)  # Ajout dans l'inventaire du joueur
                 current_room.inventory.remove_item(item_name)  # Retirer l'item de l'inventaire de la pièce
                 print(f"Vous avez pris l'objet '{item_name}'.")
+                # Si c'est un Beamer, afficher son explication
+                if isinstance(item, Beamer):
+                    print(item.explain_usage())
                 return True
         else:
             print(f"L'item '{item_name}' n'est pas présent dans la pièce.")

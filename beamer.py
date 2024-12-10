@@ -17,6 +17,7 @@ class Beamer(Item):
         if self.teleporte_room:
             print(f"Vous utilisez le beamer et vous vous êtes téléporté dans le lieu : '{self.teleporte_room.name}'.")
             player.current_room = self.teleporte_room
+            self.teleporte_room = None  # Réinitialisation après utilisation
             #game.player.history.append(game.player.current_room)
             #print(game.player.current_room.get_long_description())
             #game.player.print_history()
@@ -25,3 +26,13 @@ class Beamer(Item):
             print("Le beamer n'est pas chargé avec une destination spécifique. Impossible de l'utiliser.")
             #return False
 
+    def explain_usage(self):
+        """Fournit une explication sur ce qu'est le beamer et comment l'utiliser."""
+        return (
+            f"{self.description}.\n"
+            "Comment l'utiliser :\n"
+            "- Chargez-le avec une pièce en utilisant la commande 'charge'.\n"
+            "- Utilisez-le à tout moment pour vous téléporter dans cette pièce avec la commande 'teleporte'.\n"
+            "Attention : il doit être rechargé après chaque utilisation."
+        )
+    
