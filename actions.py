@@ -353,16 +353,18 @@ class Actions:
             print(MSG0.format(command_word=command_word))
             return False
 
-        # Récupérer l'inventaire de la pièce actuelle
+        # Récupérer la pièce actuelle
         current_room = game.player.current_room
-        inventory = current_room.get_inventory()  # Appel à la méthode de la classe Room
 
-        if hasattr(inventory, 'items'):  # Vérifie si l'inventaire possède un attribut 'items'
-            print("Voici ce qu'il y a dans ce lieu :", ', '.join(str(item) for item in inventory.items))
-        else:
-            print("Impossible d'afficher l'inventaire : format inconnu.")
+        # Afficher la pièce sans répétition du nom
+        print(f"Vous êtes dans {current_room.name}. {current_room.description}")
+
+        # Afficher l'inventaire de la pièce (objets et PNJ)
+        print(current_room.inventory.get_inventory())  # Utilisation de la méthode get_inventory pour afficher
 
         return True
+
+
 
 
 
@@ -483,3 +485,4 @@ class Actions:
             #else:
                 #print(f"L'objet '{item_name}' ne peut pas vous téléporter ou n'est pas un beamer")
                 #return False
+    

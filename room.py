@@ -66,4 +66,3 @@ class Room:
 
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
-

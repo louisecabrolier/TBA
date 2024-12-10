@@ -26,7 +26,6 @@ class Character:
         """
         return f"{self.name} : {self.description}"
 
-
     def add_message(self, msg: str) -> None:
             """
             Ajoute un message à la liste des messages du personnage.

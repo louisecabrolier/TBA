@@ -62,6 +62,7 @@ class Game:
         self.commands["charge"]= charge
         teleporte = Command("teleporte", " :  se téléporter dans une pièce déjà visitée", Actions.teleporte, 0)
         self.commands["teleporte"]= teleporte
+        
 
 
         # Setup rooms
@@ -139,6 +140,8 @@ class Game:
         entreecite.inventory["branche"] = branche
         foret.inventory["beamer"] = beamer
         carnaval.inventory["potion"] = potion
+        
+
 
      
 
@@ -148,8 +151,8 @@ class Game:
 
         bouffon = Character("Bouffon", "Le bouffon du roi", carnaval, ["J'ai quelque chose pour toi."])
         medecin = Character("Médecin", "Un médecin random", carnaval, ["J'ai quelque chose pour t'aider dans ta quête"])
-        vendeuse = Character("Vendeuse", "Une vendeuse s'approche pour te parler", carnaval, ["T'as fait tes affaires"])
-        annonceur = Character("Annonceur", "Un annonceur arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
+        vendeuse = Character("Vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
+        annonceur = Character("Annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
 
         # Liste des personnages pour le jeu
 
@@ -162,10 +165,18 @@ class Game:
         #carnaval.characters.append(vendeuse)
         #carnaval.characters.append(annonceur)
 
-        carnaval.characters["bouffon"] = bouffon
-        carnaval.characters["medecin"] = medecin
-        carnaval.characters["vendeuse"] = vendeuse
-        carnaval.characters["annonceur"] = annonceur
+        #carnaval.characters["bouffon"] = bouffon
+        #carnaval.characters["medecin"] = medecin
+        #carnaval.characters["vendeuse"] = vendeuse
+        #carnaval.characters["annonceur"] = annonceur
+
+        # Ajout des PNJ à la pièce
+        self.carnaval.inventory.add_npc(bouffon)
+        self.carnaval.inventory.add_npc(medecin)
+        self.carnaval.inventory.add_npc(vendeuse)
+        self.carnaval.inventory.add_npc(annonceur)
+
+    
 
     # Play the game
     def play(self):
