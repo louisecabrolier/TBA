@@ -26,6 +26,7 @@ class Game:
         self.commands = {}
         self.player = None
         self.characters = []
+        self.messages_history = []
        
 
 
@@ -63,6 +64,9 @@ class Game:
         self.commands["charge"]= charge
         teleporte = Command("teleporte", " :  se téléporter dans une pièce déjà visitée", Actions.teleporte, 0)
         self.commands["teleporte"]= teleporte
+        talk = Command("talk", " :  parler aux PNJ", Actions.do_talk, 0)
+        self.commands["talk"]= talk
+        
         
 
 
@@ -176,6 +180,12 @@ class Game:
         self.carnaval.inventory.add_npc(medecin)
         self.carnaval.inventory.add_npc(vendeuse)
         self.carnaval.inventory.add_npc(annonceur)
+
+        #Faire bouger les PNJ
+        bouffon.move()
+        medecin.move()
+        vendeuse.move()
+        annonceur.move()
 
     
 

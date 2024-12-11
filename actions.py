@@ -367,11 +367,6 @@ class Actions:
 
 
 
-
-
-      
-
-
     def take(game, list_of_words, number_of_parameters):
         if len(list_of_words) == 1:
             print("Que voulez-vous prendre ?")
@@ -485,4 +480,22 @@ class Actions:
             #else:
                 #print(f"L'objet '{item_name}' ne peut pas vous téléporter ou n'est pas un beamer")
                 #return False
-    
+
+
+    def do_talk(self, arg):
+        """
+        Implémente la commande 'talk <someone>'
+        """
+        if not arg:
+            print("Parler à qui ?")
+            return
+            
+        # Chercher le PNJ dans la salle actuelle
+        for npc in self.npcs:  # Supposant que self.npcs contient tous les PNJ
+            if npc.current_room == self.current_room and npc.name.lower() == arg.lower():
+                message = npc.talk()
+                print(message)
+                return
+                
+        print(f"Il n'y a pas de {arg} ici.")
+

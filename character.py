@@ -37,40 +37,64 @@ class Character:
             """
             self.msgs.append(msg)
     
-    def get_messages(self) -> list:
+    def get_messages(self):
         """
-        Retourne la liste des messages du personnage.
-        
-        Returns:
-            Liste des messages
+        Retourne cycliquement les messages du PNJ.
+        Si tous les messages ont été utilisés, recommence depuis le début.
         """
-        return self.msgs
+        if not self.messages:  # Si la liste des messages actifs est vide
+            # Réinitialiser les messages en reprenant ceux de l'historique
+            self.messages = self.message_history.copy()
+            self.message_history = []
+            
+        # Prendre le premier message et le déplacer dans l'historique
+        message = self.messages.pop(0)
+        self.message_history.append(message)
+        return message
     
+    #déplacer les PNJ
+
     def move(self):
         """
-        Déplace le personnage aléatoirement dans une pièce adjacente.
-        Retourne True si le personnage s'est déplacé, False sinon.
-        """
-        # Décider si le personnage se déplace (chance sur deux)
-        if DEBUG:
-            print(f"DEBUG: Tentative de déplacement pour {self.name} dans la salle {self.current_room.name}.")
-
-        if random.choice([True, False]):
-            # Si le personnage se déplace, choisir une salle voisine au hasard
-            possible_rooms = list(self.current_room.exits.values())  # Liste des salles adjacentes
-            if possible_rooms:
-                new_room = random.choice(possible_rooms)  # Choisir une salle adjacente au hasard
-                self.current_room = new_room  # Déplacer le personnage dans la nouvelle salle
-                
-                if DEBUG:
-                    print(f"DEBUG: {self.name} s'est déplacé dans la salle {new_room.name}.")
-                return True  # Le personnage s'est déplacé
-            else:
-                if DEBUG:
-                    print(f"DEBUG: {self.name} n'a pas de salle voisine pour se déplacer.")
-        else:
-            if DEBUG:
-                print(f"DEBUG: {self.name} n'a pas bougé cette fois.")
+        Déplace le PNJ selon les règles suivantes:
+        - 50% de chance de se déplacer
+        - Si déplacement, va dans une pièce adjacente au hasard
         
-        return False  # Le personnage n'a pas bougé
+        Returns:
+            bool: True si le PNJ s'est déplacé, False sinon
+        """
+        if DEBUG:
+            print(f"DEBUG: Tentative de déplacement pour {self.name} depuis {self.current_room.name}")
+        
+        # Filtrer les sorties non-None
+        possible_rooms = [room for room in self.current_room.exits.values() if room is not None]
+        
+        if not possible_rooms:  # Si pas de sorties valides
+            if DEBUG:
+                print(f"DEBUG: {self.name} ne peut pas se déplacer - aucune sortie disponible")
+            return False
+        
+        # 50% de chance de se déplacer
+        will_move = random.choice([True, False])
+        
+        if will_move:
+            # Choisir une pièce au hasard parmi les sorties disponibles
+            new_room = random.choice(possible_rooms)
+            self.current_room = new_room
+            if DEBUG:
+                print(f"DEBUG: {self.name} s'est déplacé vers {new_room.name}")
+            return True
+        
+        if DEBUG:
+            print(f"DEBUG: {self.name} reste dans la salle {self.current_room.name}")
+        return False
     
+
+    #Interagir avec PNJ
+
+    def talk(self):
+        """
+        Action déclenchée par la commande 'talk'
+        Retourne le prochain message du PNJ
+        """
+        return self.get_messages()
