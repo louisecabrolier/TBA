@@ -293,21 +293,20 @@ class Actions:
                 print(MSG0.format(command_word=command_word))
                 return False
 
-
-
-
             # Check if there is a previous position to return to.
             if not player.history:
                 print("Vous ne pouvez pas revenir en arrière, aucun déplacement précédent enregistré.")
                 return False
 
-
-
-
             # Pop the last position from the history and move the player back.
             previous_position = player.history.pop()
+
             player.position = previous_position
+            #mettre a jour l'inventaire dune piece avec le back
+            player.current_room = previous_position
+            
             print(f"Vous êtes revenu à votre position précédente : {player.position.name}")
+
             return True
 
 
