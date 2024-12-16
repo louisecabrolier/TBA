@@ -12,7 +12,10 @@ from item import Item
 from character import Character
 from beamer import Beamer
 from config import DEBUG
-
+from checkvictory import CheckVictory
+from checkdefeat import CheckDefeat
+#from CheckVictory import CONDITIONS_VICT
+#from CheckDefeat import CONDITIONS_DEF
 
 class Game:
 
@@ -27,6 +30,9 @@ class Game:
         self.player = None
         self.characters = []
         self.messages_history = []
+        self.is_game_over = False
+        
+
        
 
 
@@ -130,6 +136,7 @@ class Game:
         self.foret = foret  # Store room as instance attribute
         self.entreecite = entreecite
         self.carnaval = carnaval
+        self.chateau = chateau
 
 
         shield = Item("shield", "un bouclier léger et résistant", 5)
@@ -159,10 +166,11 @@ class Game:
         vendeuse = Character("vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
         annonceur = Character("annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
         pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["tu perds ton temps à me parler", "on espere que la démo vous plait"])
-
+        garde = Character("garde", "Le garde du chateau", chateau, ["Peux tu me donner l'objet nécessaire pour entrer"])
+        
         # Liste des personnages pour le jeu
 
-        self.characters = [bouffon, medecin, vendeuse, annonceur, pnj]
+        self.characters = [bouffon, medecin, vendeuse, annonceur, pnj, garde]
 
 
         # Ajout des PNJ à la pièce
@@ -171,7 +179,7 @@ class Game:
         self.carnaval.inventory.add_npc(vendeuse)
         self.carnaval.inventory.add_npc(annonceur)
         self.entreecite.inventory.add_npc(pnj)
-
+        self.chateau.inventory.add_npc(garde)
 
         #Faire bouger les PNJ
         #bouffon.move()
@@ -181,11 +189,23 @@ class Game:
         pnj.move()
 
 
+    
     def play(self):
         self.setup()
         self.print_welcome()
-
+        
+        # Initialisation des vérificateurs de victoire et défaite
+        self.victory_checker = CheckVictory()
+        self.defeat_checker = CheckDefeat()
+        
         while not self.finished:
+            # Vérification des conditions de victoire/défaite
+            game_state = self.check_game_state()
+            if game_state:
+                print(game_state)
+                self.finished = True
+                break
+
             # Récupérer la commande
             command = input("> ")
             
@@ -199,80 +219,96 @@ class Game:
             if should_move_npcs:
                 if DEBUG:
                     print("DEBUG: Début du déplacement du PNJ")
-                
                 # Chercher uniquement le PNJ mobile dans toutes les pièces
                 for room in self.rooms:
                     if "pnj" in room.inventory.npcs:
                         pnj = room.inventory.npcs["pnj"]
                         pnj.move()
                         break  # On sort dès qu'on a trouvé et déplacé le PNJ
-                
                 if DEBUG:
                     print("DEBUG: Fin du déplacement du PNJ")
 
-    # Process the command entered by the player
+    def check_game_state(self):
+        """Vérifie l'état du jeu et retourne un message si le jeu est terminé"""
+        # Vérification des conditions de défaite
+        for condition in self.defeat_checker.CONDITIONS_DEF:
+            if condition():
+                return "\nDÉFAITE: Vous avez atteri dans l'endroit inconnu!\n"
+
+        # Mise à jour des conditions de victoire basées sur l'état actuel
+        self.update_victory_conditions()
+
+        # Vérification des conditions de victoire
+        if all(condition() for condition in self.victory_checker.CONDITIONS_VICT):
+            return "\nVICTOIRE: Félicitations, vous avez accompli votre quête!\n"
+
+        return None
+
+    def update_victory_conditions(self):
+        """Met à jour les conditions de victoire basées sur l'état actuel du jeu"""
+        # Vérifie si le joueur est dans le château
+        self.victory_checker.update_condition("chateau", 
+            self.player.current_room.name == "chateau")
+        
+        # Vérifie si le joueur a parlé à l'annonceur
+        # Supposons que nous gardons une trace des interactions dans player
+        if hasattr(self.player, 'has_talked_to_annonceur'):
+            self.victory_checker.update_condition("annonceur", 
+                self.player.has_talked_to_annonceur)
+        
+        # Vérifie si le joueur a l'objet requis
+        required_object = "objet_spécifique"  # À adapter selon votre jeu
+        if hasattr(self.player, 'inventory'):
+            self.victory_checker.update_condition("object",
+                required_object in self.player.inventory)
+
+        # Vérifie si le joueur a parlé au garde
+        if hasattr(self.player, 'has_talked_to_garde'):
+            self.victory_checker.update_condition("garde",
+                self.player.has_talked_to_garde)
+
     def process_command(self, command_string) -> None:
-    #Supprimer les espaces avant et après
+        # Code existant...
         command_string = command_string.strip()
-
-
-        #Si la commande est vide, ne rien faire
         if command_string == "":
             return
-
-
-        # Split the command string into a list of words
+            
         list_of_words = command_string.split(" ")
         command_word = list_of_words[0]
-
+        
         if DEBUG:
             print(f"DEBUG: Liste des mots de la commande: {list_of_words}")
 
-
-
         if command_word == "go":
             if len(list_of_words) < 2:
-                print ("\n Veuillez spécifier une direction.\n")
+                print("\nVeuillez spécifier une direction.\n")
                 return
 
-        
-
-            # crea du set des directions possibles
             directions_values = {"N", "S", "E", "O", "U", "D"}
             direction = list_of_words[1][0].upper()
-               
-            # verif que la direction existe
+
             if direction not in directions_values:
                 print("\nDirection invalide.\n")
                 return
 
-
-
-
-            # Modification de la direction dans list_of_words
             list_of_words[1] = direction
-
-
-
-
-            # Création du set des directions valides pour la salle concernée
+            
             directions_valides = set()
             for direction_possible, next_room in self.player.current_room.exits.items():
                 if next_room is not None:
                     directions_valides.add(direction_possible)
-               
-            # Vérifier si la direction est possible depuis cette salle
+
             if direction not in directions_valides:
                 print("\nVous ne pouvez pas aller dans cette direction.\n")
                 return
 
+            # Vérifier si le déplacement mène à un endroit inconnu (condition de défaite)
+            next_room = self.player.current_room.exits.get(direction)
+            if next_room and next_room.is_unknown:  # Supposons que nous avons cet attribut
+                self.defeat_checker.update_condition(True)
 
-
-
-        # If the command is not recognized, print an error message
         if command_word not in self.commands.keys():
             print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
-        # If the command is recognized, execute it
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
