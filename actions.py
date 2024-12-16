@@ -395,7 +395,6 @@ class Actions:
 
 
 
-
     def drop(game, list_of_words, number_of_parameters):
         if len(list_of_words) < 2:
             print("Que voulez-vous déposer ?")
@@ -426,7 +425,7 @@ class Actions:
 
     
 
-    def charge(game, list_of_words, number_of_parameters):
+    def charge(game):
         player = game.player
         #beamer = player.inventory.get("beamer")
         beamer = player.inventory["beamer"]
@@ -436,23 +435,7 @@ class Actions:
         
         beamer.charge(player.current_room)
     
-        #if len(list_of_words)!= number_of_parameters +1:
-            #command_word = list_of_words[0]
-            #print(MSG1.format(command_word=command_word))
-            #return False
-       
-        #item_name = list_of_words[1]
-        #item = game.player.inventory.get(item_name, None)
-       
-        #print(item_name)
-        #if item_name in game.player.inventory:
-            #item[2].charge(game.player.current_room)
-            #return True
-        #else:
-            #print(f"L'objet '{item_name}' ne peut pas être chargé ou n'est pas un beamer")
-            #return False
-
-    def teleporte(game, list_of_words, number_of_parameters):
+    def teleporte(game):
             player = game.player
             beamer = player.inventory["beamer"]
 
@@ -463,38 +446,37 @@ class Actions:
             beamer.teleporte(player)
 
 
-    #def teleporte(game, list_of_words, number_of_parameters):
-        #if len(list_of_words)!= number_of_parameters +1:
-            #command_word = list_of_words[0]
-            #print(MSG1.format(command_word=command_word))
-            #return False
-       
-        #item_name = list_of_words[1]
-        #item = game.player.inventory.get(item_name, None)
 
-
-        #if item_name in game.player.inventory:
-            #if isinstance(item[2],Beamer):
-                #return item[2].use(game)
-            #else:
-                #print(f"L'objet '{item_name}' ne peut pas vous téléporter ou n'est pas un beamer")
-                #return False
-
-
-    def do_talk(self, arg):
+    def talk(game, list_of_words, number_of_parameters):
         """
-        Implémente la commande 'talk <someone>'
+        Permet au joueur d'interagir avec un PNJ.
         """
-        if not arg:
+        if len(list_of_words) < 2:
             print("Parler à qui ?")
-            return
-            
-        # Chercher le PNJ dans la salle actuelle
-        for npc in self.npcs:  # Supposant que self.npcs contient tous les PNJ
-            if npc.current_room == self.current_room and npc.name.lower() == arg.lower():
-                message = npc.talk()
-                print(message)
-                return
-                
-        print(f"Il n'y a pas de {arg} ici.")
+            return False
+        
+        # Récupérer le nom du PNJ avec la casse d'origine
+        npc_name = ' '.join(list_of_words[1:])
+        current_room = game.player.current_room
 
+        # Chercher le PNJ dans la pièce actuelle en ignorant la casse
+        found_npc = None
+        for npc in current_room.inventory.npcs.values():
+            if npc.name.lower() == npc_name.lower():
+                found_npc = npc
+                break
+
+        if found_npc:
+            message = found_npc.get_msg()
+            print(f"\n{found_npc.name} (dans {found_npc.current_room.name}) : {message}\n")
+            return True
+        else:
+            # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
+            for room in game.rooms:
+                for npc in room.inventory.npcs.values():
+                    if npc.name.lower() == npc_name.lower():
+                        print(f"\n{npc.name} n'est pas ici. Il/Elle se trouve dans : {room.name}\n")
+                        return False
+
+            print(f"\nIl n'y a personne qui s'appelle '{npc_name}' dans les environs.\n")
+            return False

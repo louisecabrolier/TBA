@@ -53,7 +53,7 @@ class Game:
         self.commands["inventory"]= inventory
         look = Command("look", " : regarder dans la pièce", Actions.look, 0)
         self.commands["look"]= look
-        take = Command("take", " : prendre l'objet", Actions.take, 0)
+        take = Command("take", " : prendre l'objet", Actions.take, 1)
         self.commands["take"]= take
         drop = Command("drop", " : poser l'objet", Actions.drop, 0)
         self.commands["drop"]= drop
@@ -64,7 +64,7 @@ class Game:
         self.commands["charge"]= charge
         teleporte = Command("teleporte", " :  se téléporter dans une pièce déjà visitée", Actions.teleporte, 0)
         self.commands["teleporte"]= teleporte
-        talk = Command("talk", " :  parler aux PNJ", Actions.do_talk, 0)
+        talk = Command("talk", " :  parler aux PNJ", Actions.talk, 1)
         self.commands["talk"]= talk
         
         
@@ -154,70 +154,61 @@ class Game:
 
         # Création des personnages
 
-        bouffon = Character("Bouffon", "Le bouffon du roi", carnaval, ["J'ai quelque chose pour toi."])
-        medecin = Character("Médecin", "Un médecin random", carnaval, ["J'ai quelque chose pour t'aider dans ta quête"])
-        vendeuse = Character("Vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
-        annonceur = Character("Annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
+        bouffon = Character("bouffon", "Le bouffon du roi", carnaval, ["J'ai quelque chose pour toi."])
+        medecin = Character("medecin", "Un médecin random", carnaval, ["J'ai quelque chose pour t'aider dans ta quête"])
+        vendeuse = Character("vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
+        annonceur = Character("annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
+        pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["tu perds ton temps à me parler", "on espere que la démo vous plait"])
 
         # Liste des personnages pour le jeu
 
-        self.characters = [bouffon, medecin, vendeuse, annonceur]
+        self.characters = [bouffon, medecin, vendeuse, annonceur, pnj]
 
-        #Ajout des personnages aux lieux
-
-        #carnaval.characters.append(bouffon)
-        #carnaval.characters.append(medecin)
-        #carnaval.characters.append(vendeuse)
-        #carnaval.characters.append(annonceur)
-
-        #carnaval.characters["bouffon"] = bouffon
-        #carnaval.characters["medecin"] = medecin
-        #carnaval.characters["vendeuse"] = vendeuse
-        #carnaval.characters["annonceur"] = annonceur
 
         # Ajout des PNJ à la pièce
         self.carnaval.inventory.add_npc(bouffon)
         self.carnaval.inventory.add_npc(medecin)
         self.carnaval.inventory.add_npc(vendeuse)
         self.carnaval.inventory.add_npc(annonceur)
+        self.entreecite.inventory.add_npc(pnj)
+
 
         #Faire bouger les PNJ
-        bouffon.move()
-        medecin.move()
-        vendeuse.move()
-        annonceur.move()
+        #bouffon.move()
+        #medecin.move()
+        #vendeuse.move()
+        #annonceur.move()
+        pnj.move()
 
-    
 
     def play(self):
         self.setup()
         self.print_welcome()
 
-        # Loop until the game is finished
         while not self.finished:
-            # Process player command
-            self.process_command(input("> "))
-
-            # Déplacer tous les PNJ dans la salle actuelle à chaque tour
-            if DEBUG:
-                print("DEBUG: Début du déplacement des PNJ.")
+            # Récupérer la commande
+            command = input("> ")
             
-            # Récupérer tous les PNJ dans la salle actuelle du joueur
-            for npc in self.player.current_room.get_inventory().npcs.values():  # Utilisation de get_inventory()
-                if npc.move():  # Si le PNJ se déplace
-                    if DEBUG:
-                        print(f"DEBUG: {npc.name} s'est déplacé dans la salle {npc.current_room.name}.")
-                else:
-                    if DEBUG:
-                        print(f"DEBUG: {npc.name} reste dans la salle {npc.current_room.name}.")
+            # Vérifier si c'est une commande "go" avant de déplacer le PNJ
+            should_move_npcs = command.strip().startswith("go")
             
-            if DEBUG:
-                print("DEBUG: Fin du déplacement des PNJ.")
-
-        return None
-
-
-
+            # Traiter la commande du joueur
+            self.process_command(command)
+            
+            # Déplacer uniquement le PNJ mobile si c'était une commande "go"
+            if should_move_npcs:
+                if DEBUG:
+                    print("DEBUG: Début du déplacement du PNJ")
+                
+                # Chercher uniquement le PNJ mobile dans toutes les pièces
+                for room in self.rooms:
+                    if "pnj" in room.inventory.npcs:
+                        pnj = room.inventory.npcs["pnj"]
+                        pnj.move()
+                        break  # On sort dès qu'on a trouvé et déplacé le PNJ
+                
+                if DEBUG:
+                    print("DEBUG: Fin du déplacement du PNJ")
 
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
@@ -225,12 +216,9 @@ class Game:
         command_string = command_string.strip()
 
 
-
-
         #Si la commande est vide, ne rien faire
         if command_string == "":
             return
-
 
 
         # Split the command string into a list of words
