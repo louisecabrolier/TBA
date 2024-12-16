@@ -30,6 +30,7 @@ import room
 from beamer import Beamer
 
 
+
 class Actions:
 
 
@@ -328,8 +329,6 @@ class Actions:
             bool: True if the command was executed successfully, False otherwise.
         """
        
-        player = game.player
-        current_room = room.Room
         l = len(list_of_words)
        
         # Vérification du nombre de paramètres
@@ -430,7 +429,8 @@ class Actions:
 
     def charge(game, list_of_words, number_of_parameters):
         player = game.player
-        beamer = player.inventory.get("beamer")
+        #beamer = player.inventory.get("beamer")
+        beamer = player.inventory["beamer"]
         if not beamer:
             print("Vous ne posséder pas de beamer pour le charger.")
             return
@@ -455,7 +455,7 @@ class Actions:
 
     def teleporte(game, list_of_words, number_of_parameters):
             player = game.player
-            beamer = player.inventory.get("beamer")
+            beamer = player.inventory["beamer"]
 
             if not beamer:
                 print("Vous ne possédez pas de beamer pour l'utiliser.")

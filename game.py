@@ -49,7 +49,7 @@ class Game:
         self.commands["history"] = history
         back = Command("back", " : retourner en arrière", Actions.back, 0)
         self.commands["back"]= back
-        inventory = Command("inventory", " : retourner en arrière", Actions.inventory, 0)
+        inventory = Command("inventory", " : inventaire", Actions.inventory, 0)
         self.commands["inventory"]= inventory
         look = Command("look", " : regarder dans la pièce", Actions.look, 0)
         self.commands["look"]= look
