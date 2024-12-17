@@ -21,6 +21,7 @@ class Character:
         #self.msgs = msgs if msgs is not None else []
         self.msgs = msgs.copy()  # Liste originale des messages
         self._current_msgs = msgs.copy()  # Liste des messages courants
+        self.has_spoken = False  # Par défaut, le joueur n'a pas encore parlé
 
     def __str__(self):
         """

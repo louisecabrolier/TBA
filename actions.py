@@ -28,6 +28,9 @@ MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 import inventory
 import room
 from beamer import Beamer
+from player import Player
+from item import Item
+
 
 
 
@@ -345,55 +348,71 @@ class Actions:
         #print(current_room.get_inventory())
         #return True
    
+    # Dans votre fonction look
     def look(game, list_of_words, number_of_parameters):
-        if len(list_of_words) != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
-            return False
-
-        # Récupérer la pièce actuelle
+        """
+        Permet au joueur de regarder autour de lui ou un objet spécifique.
+        """
         current_room = game.player.current_room
-
-        # Afficher la pièce sans répétition du nom
-        print(f"Vous êtes dans {current_room.name}")
-
-        # Afficher l'inventaire de la pièce (objets et PNJ)
-        print(current_room.inventory.get_inventory())  # Utilisation de la méthode get_inventory pour afficher
-
+        
+        # Description de la pièce
+        print(current_room.description)
+        
+        # Afficher les objets visibles
+        print("\nObjets visibles :")
+        for name, data in current_room.inventory.items.items():
+            # Vérifier si l'objet n'est pas caché
+            if not data["hidden"]:
+                item = data["item"]
+                print(f" - {item.name} : {item.description}")
+        
+        # Afficher les PNJ
+        if current_room.inventory.npcs:
+            print("\nPersonnages :")
+            for npc in current_room.inventory.npcs.values():
+                print(f" - {npc.name} : {npc.description}")
+        
         return True
 
 
 
 
+
+
+
     def take(game, list_of_words, number_of_parameters):
-        if len(list_of_words) == 1:
-            print("Que voulez-vous prendre ?")
+        """
+        Permet au joueur de prendre un objet.
+        """
+        if len(list_of_words) != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
             return False
-        
+
+        # Récupérer l'objet à prendre
         item_name = list_of_words[1]
         current_room = game.player.current_room
-        
-        # Vérifier si l'item existe dans l'inventaire de la pièce
-        if item_name in current_room.inventory.items:
-            item = current_room.inventory.items[item_name]  # Récupérer l'item de la pièce
-            if game.player.get_current_weight() + item.poids > game.player.max_poids:
-                print(f"Vous ne pouvez pas prendre '{item_name}'. Vous dépassez la limite de poids autorisée ({game.player.max_poids} kg).")
-                return
-            else: 
-                # Ajouter l'item à l'inventaire du joueur en utilisant get_inventory
-                game.player.get_inventory().add_item(item)  # Ajout dans l'inventaire du joueur
-                current_room.inventory.remove_item(item_name)  # Retirer l'item de l'inventaire de la pièce
-                print(f"Vous avez pris l'objet '{item_name}'.")
-                # Filtrer les directions accessibles (celles qui ne sont pas None)
-                available_directions = [direction for direction, room in current_room.exits.items() if room is not None]
-                print(f"Pour rappel, vous êtes dans '{current_room.name}' et les directions possibles sont : {', '.join(available_directions)}.")
-                # Si c'est un Beamer, afficher son explication
-                if isinstance(item, Beamer):
-                    print(item.explain_usage())
-                return True
+
+        # Chercher l'objet dans l'inventaire de la pièce
+        visible_items = current_room.inventory.get_visible_items()
+        if item_name in visible_items:
+            item = visible_items[item_name]  # Now this is the actual Item object
+            
+            # Vérifier le poids de l'objet
+            if game.player.get_current_weight() + item.poids > game.player.max_poids: 
+                print("Vous avez trop de poids, vous ne pouvez pas prendre cet objet.")
+                return False
+            
+            # Ajouter l'objet à l'inventaire du joueur
+            game.player.inventory.add_item(item)
+            current_room.inventory.remove_item(item_name)
+            print(f"Vous avez pris {item.name}.")
+            return True
         else:
-            print(f"L'item '{item_name}' n'est pas présent dans la pièce.")
+            print(f"L'objet '{item_name}' n'est pas dans cette pièce.")
             return False
+
+
 
 
 
@@ -470,8 +489,17 @@ class Actions:
                 break
 
         if found_npc:
+            # Afficher le message du PNJ
             message = found_npc.get_msg()
             print(f"\n{found_npc.name} (dans {found_npc.current_room.name}) : {message}\n")
+            
+            # Si le PNJ est le marchand, révéler la potion cachée
+            if found_npc.name.lower() == "marchand":
+                potion_data = current_room.inventory.items.get("potion")  # Récupérer la potion
+                if potion_data and potion_data["hidden"]:  # Si la potion est cachée
+                    potion_data["hidden"] = False  # Révéler la potion
+                    print("Le marchand vous montre une potion cachée dans cette pièce !")
+            
             return True
         else:
             # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
@@ -483,3 +511,4 @@ class Actions:
 
             print(f"\nIl n'y a personne qui s'appelle '{npc_name}' dans les environs.\n")
             return False
+

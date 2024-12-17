@@ -14,6 +14,7 @@ class Player():
         self.history = []
         self.inventory = Inventory()
         self.max_poids = 10  # Poids maximum en kg
+        self.has_spoken_to_merchant = False  # Indique si le joueur a parlé au marchand
 
 
     # Define the move method.
@@ -81,7 +82,8 @@ class Player():
         return self.inventory
 
     def get_current_weight(self): #pr pas que l'inventaire nait une val maximum a 10kg
-        return sum(item.poids for item in self.inventory.items.values())
+        return sum(data["item"].poids for data in self.inventory.items.values())
+
 
 
     def check(self):
@@ -92,4 +94,12 @@ class Player():
             print("Votre inventaire contient :")
             for item_name, item in self.inventory.items.items():
                 print(f"- {item_name}: {item.description} ({item.poids} kg)")
+
+
+        
+
+    def talk_to_merchant(self):
+        self.has_spoken_to_merchant = True  # Met à jour l'état de la conversation
+        # Vous pouvez également rendre un objet révélé ici si nécessaire
+        # Exemple : current_room.inventory.items["potion"]["item"].revealed = True
 

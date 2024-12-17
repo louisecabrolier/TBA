@@ -4,29 +4,22 @@ class Inventory:
     """
     def __init__(self):
         self.items = {}  # Dictionnaire associant des items à leur nom
-        self.npcs = {}   # Dictionnaire associant des PNJ à leur nom
+        self.npcs = {}  # Dictionnaire associant des PNJ à leur nom
 
-    def __setitem__(self, key, value):
-        """Permet l'ajout d'un item avec la syntaxe de dictionnaire."""
-        self.items[key] = value
-
-    def __getitem__(self, key):
-        """Permet d'accéder à un item avec la syntaxe de dictionnaire."""
-        return self.items[key]
-
-    def add_item(self, item):
+    def add_item(self, item, hidden=False):
         """
         Ajoute un item à l'inventaire.
         :param item: Instance de la classe Item
+        :param hidden: Indique si l'objet est caché
         """
-        self.items[item.name] = item
+        # Store the item and its hidden status as a dictionary
+        self.items[item.name] = {"item": item, "hidden": hidden}
 
-    def add_npc(self, npc):
+    def get_visible_items(self):
         """
-        Ajoute un PNJ à l'inventaire.
-        :param npc: Instance de la classe NPC
+        Retourne uniquement les objets visibles dans l'inventaire (ceux dont 'hidden' est False).
         """
-        self.npcs[npc.name] = npc
+        return {name: data["item"] for name, data in self.items.items() if not data["hidden"]}
 
     def remove_item(self, item_name):
         """
@@ -36,13 +29,13 @@ class Inventory:
         """
         return self.items.pop(item_name, None)
 
-    def remove_npc(self, npc_name):
+    def reveal_item(self, item_name):
         """
-        Retire un PNJ de l'inventaire.
-        :param npc_name: Nom du PNJ à retirer
-        :return: Le PNJ retiré ou None s'il n'existe pas
+        Révèle un item caché.
+        :param item_name: Nom de l'item à révéler
         """
-        return self.npcs.pop(npc_name, None)
+        if item_name in self.items:
+            self.items[item_name]["hidden"] = False
 
     def get_inventory(self):
         """
@@ -51,15 +44,39 @@ class Inventory:
         """
         if not self.items and not self.npcs:
             return "Il n'y a rien ici."
-
-        result = "On voit:\n"
         
+        result = "On voit:\n"
         # Ajout des items
-        for key, item in self.items.items():
-            result += f"        - {key} : {item.description} ({item.poids} kg)\n"
-            
+        for name, data in self.items.items():
+            if not data["hidden"]:
+                item = data["item"]
+                result += f" - {name} : {item.description} ({item.poids} kg)\n"
+        
         # Ajout des PNJ
         for key, npc in self.npcs.items():
-            result += f"        - {key} : {npc.description}\n"
-            
+            result += f" - {key} : {npc.description}\n"
+        
         return result.rstrip()  # Enlève le dernier retour à la ligne
+
+    def __setitem__(self, key, value):
+        """Permet l'ajout d'un item avec la syntaxe de dictionnaire."""
+        self.items[key] = {"item": value, "hidden": False}
+
+    def __getitem__(self, key):
+        """Permet d'accéder à un item avec la syntaxe de dictionnaire."""
+        return self.items[key]["item"]
+
+    def add_npc(self, npc):
+        """
+        Ajoute un PNJ à l'inventaire.
+        :param npc: Instance de la classe NPC
+        """
+        self.npcs[npc.name] = npc
+
+    def remove_npc(self, npc_name):
+        """
+        Retire un PNJ de l'inventaire.
+        :param npc_name: Nom du PNJ à retirer
+        :return: Le PNJ retiré ou None s'il n'existe pas
+        """
+        return self.npcs.pop(npc_name, None)

@@ -96,12 +96,12 @@ class Game:
         self.rooms.append(marche)
         piedmonC = Room("Pied de la montagne (Centre)", "pied central de la montagne")
         self.rooms.append(piedmonC)
-        MonO = Room("Montagne (chemin Ouest)", "montagne coté ouest")
-        self.rooms.append(MonO)
+        monO = Room("Montagne (chemin Ouest)", "montagne coté ouest")
+        self.rooms.append(monO)
         chateau = Room("Château", "chateau")
         self.rooms.append(chateau)
-        Montagnesombre = Room("Montagne sombre", " montagne sombre")
-        self.rooms.append(Montagnesombre)
+        montagnesombre = Room("Montagne sombre", " montagne sombre")
+        self.rooms.append(montagnesombre)
         endroitinconnu = Room("Endroit inconnu","endroit inconnu")
         self.rooms.append(endroitinconnu)
         bordcite = Room("Bord de la cité","bord de la cité")
@@ -117,13 +117,13 @@ class Game:
         maisonRDC.exits = {"N" : marche, "E" : None, "S" : None, "O" : entreecite, "U" : None, "D": maisonsoussol}
         maisonsoussol.exits = {"N" : None, "E" : None, "S" : None, "O" : None, "U" : maisonRDC, "D" : None}
         alleeprincipale.exits = {"N" : piedmonC, "E" : marche, "S" : entreecite, "O" : piedmontagneouest}
-        piedmontagneouest.exits = {"N" : MonO, "E" : alleeprincipale, "S" : carnaval, "O" : None}
+        piedmontagneouest.exits = {"N" : monO, "E" : alleeprincipale, "S" : carnaval, "O" : None}
         marche.exits = {"N" : maisonRDC, "E" : None, "S" : None, "O" : alleeprincipale}
-        piedmonC.exits = {"N" : MonO, "E" : None, "S" : alleeprincipale, "O" : MonO}
-        MonO.exits = {"N" : chateau, "E" : piedmonC, "S" : piedmontagneouest, "O" : None}
-        chateau.exits = {"N" : None, "E" : Montagnesombre, "S" : None, "O" : None}
-        Montagnesombre.exits = {"N" : None, "E" : endroitinconnu, "S" : piedmonC, "O" : chateau}
-        endroitinconnu.exits = {"N" : None, "E" : None, "S" : None, "O" : Montagnesombre}
+        piedmonC.exits = {"N" : monO, "E" : None, "S" : alleeprincipale, "O" : monO}
+        monO.exits = {"N" : chateau, "E" : piedmonC, "S" : piedmontagneouest, "O" : None}
+        chateau.exits = {"N" : None, "E" : montagnesombre, "S" : None, "O" : None}
+        montagnesombre.exits = {"N" : None, "E" : endroitinconnu, "S" : piedmonC, "O" : chateau}
+        endroitinconnu.exits = {"N" : None, "E" : None, "S" : None, "O" : montagnesombre}
         bordcite.exits = {"N" : carnaval, "E" : None, "S" : None, "O" : None}
 
 
@@ -138,6 +138,17 @@ class Game:
         self.entreecite = entreecite
         self.carnaval = carnaval
         self.chateau = chateau
+        self.alleeprincipale = alleeprincipale
+        self.maisonRDC = maisonRDC
+        self.maisonsoussol = maisonsoussol
+        self.piedmontagneouest = piedmontagneouest
+        self.marche = marche
+        self.piedmonC = piedmonC
+        self.monO = monO
+        self.montagnesombre = montagnesombre
+        self.endroitinconnu = endroitinconnu
+        self.bordcite = bordcite
+
 
 
         shield = Item("shield", "un bouclier léger et résistant", 5)
@@ -154,9 +165,11 @@ class Game:
         foret.inventory["helmet"] = helmet
         entreecite.inventory["branche"] = branche
         foret.inventory["beamer"] = beamer
-        carnaval.inventory["potion"] = potion
+        marche.inventory.items["potion"] = {"item": potion, "hidden": True} #potion cachée au début avant de parler au marchand
         foret.inventory["mushroom"] = mushroom
         foret.inventory["key"] = key
+
+    
         
 
 
@@ -172,10 +185,11 @@ class Game:
         annonceur = Character("annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
         pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["Tu perds ton temps à me parler", "on espère que la démo vous plaît"])
         garde = Character("garde", "Le garde du chateau", chateau, ["Peux-tu me donner l'objet nécessaire pour entrer"])
-        
+        marchand = Character("marchand", "Un marchand", marche, ["Un objet utile pour toi se trouve dans cette pièce"])
+
         # Liste des personnages pour le jeu
 
-        self.characters = [bouffon, medecin, vendeuse, annonceur, pnj, garde]
+        self.characters = [bouffon, medecin, vendeuse, annonceur, pnj, garde, marchand]
 
 
         # Ajout des PNJ à la pièce
@@ -185,6 +199,7 @@ class Game:
         self.carnaval.inventory.add_npc(annonceur)
         self.entreecite.inventory.add_npc(pnj)
         self.chateau.inventory.add_npc(garde)
+        self.marche.inventory.add_npc(marchand)
 
         #Faire bouger les PNJ
         #bouffon.move()
