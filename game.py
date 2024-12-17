@@ -14,6 +14,7 @@ from beamer import Beamer
 from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
+from door import Door
 #from CheckVictory import CONDITIONS_VICT
 #from CheckDefeat import CONDITIONS_DEF
 
@@ -31,12 +32,12 @@ class Game:
         self.characters = []
         self.messages_history = []
         self.is_game_over = False
+        self.door = Door()
+        self.door_opened = False  # Pour suivre si la porte a déjà été ouverte
+
         
 
-       
-
-
-
+    
 
     # Setup the game
     def setup(self):
@@ -144,6 +145,8 @@ class Game:
         branche = Item("branche", "une branche d'arbre", 1)
         potion = Item("potion", "une potion magique qui va t'aider", 1)
         beamer = Beamer("beamer", "un objet magique qui permet la téléportation", 1)
+        mushroom = Item("mushroom", "un champignon doré très rare", 1)
+        key = Item("key", "une clé qui permet d'ouvrir les portes de la cité", 1)
 
 
         # Ajout des items à l'inventaire des lieux directement via le dictionnaire
@@ -152,6 +155,8 @@ class Game:
         entreecite.inventory["branche"] = branche
         foret.inventory["beamer"] = beamer
         carnaval.inventory["potion"] = potion
+        foret.inventory["mushroom"] = mushroom
+        foret.inventory["key"] = key
         
 
 
@@ -165,8 +170,8 @@ class Game:
         medecin = Character("medecin", "Un médecin random", carnaval, ["J'ai quelque chose pour t'aider dans ta quête"])
         vendeuse = Character("vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
         annonceur = Character("annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
-        pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["tu perds ton temps à me parler", "on espere que la démo vous plait"])
-        garde = Character("garde", "Le garde du chateau", chateau, ["Peux tu me donner l'objet nécessaire pour entrer"])
+        pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["Tu perds ton temps à me parler", "on espère que la démo vous plaît"])
+        garde = Character("garde", "Le garde du chateau", chateau, ["Peux-tu me donner l'objet nécessaire pour entrer"])
         
         # Liste des personnages pour le jeu
 
@@ -260,7 +265,8 @@ class Game:
         required_object = "objet_spécifique"  # À adapter selon votre jeu
         if hasattr(self.player, 'inventory'):
             self.victory_checker.update_condition("object",
-                required_object in self.player.inventory)
+                required_object in self.player.inventory.items)
+        
 
         # Vérifie si le joueur a parlé au garde
         if hasattr(self.player, 'has_talked_to_garde'):
@@ -292,6 +298,19 @@ class Game:
                 return
 
             list_of_words[1] = direction
+
+            # Vérifier si on est dans la forêt et qu'on va vers la cité
+            if self.player.current_room == self.foret and direction == "N":
+                if not self.door_opened:  # Si la porte n'a pas encore été ouverte
+                    # Vérifier si le joueur a la clé
+                    has_key = "key" in self.player.inventory.items  # items est un dictionnaire, pas une méthode
+                    if not has_key:
+                        print("\nVous ne pouvez pas entrer dans la cité sans la clé.\n")
+                        return
+                    else:
+                        print("\nVous utilisez la clé pour ouvrir les portes de la cité.")
+                        self.door_opened = True  # La porte est maintenant ouverte
+
             
             directions_valides = set()
             for direction_possible, next_room in self.player.current_room.exits.items():
@@ -302,9 +321,9 @@ class Game:
                 print("\nVous ne pouvez pas aller dans cette direction.\n")
                 return
 
-            # Vérifier si le déplacement mène à un endroit inconnu (condition de défaite)
+           # Vérifier si le déplacement mène à "endroitinconnu" (condition de défaite)
             next_room = self.player.current_room.exits.get(direction)
-            if next_room and next_room.is_unknown:  # Supposons que nous avons cet attribut
+            if next_room and next_room.name == "Endroit inconnu":  # Vérifie le nom de la salle
                 self.defeat_checker.update_condition(True)
 
         if command_word not in self.commands.keys():

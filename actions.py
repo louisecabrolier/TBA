@@ -384,6 +384,9 @@ class Actions:
                 game.player.get_inventory().add_item(item)  # Ajout dans l'inventaire du joueur
                 current_room.inventory.remove_item(item_name)  # Retirer l'item de l'inventaire de la pièce
                 print(f"Vous avez pris l'objet '{item_name}'.")
+                # Filtrer les directions accessibles (celles qui ne sont pas None)
+                available_directions = [direction for direction, room in current_room.exits.items() if room is not None]
+                print(f"Pour rappel, vous êtes dans '{current_room.name}' et les directions possibles sont : {', '.join(available_directions)}.")
                 # Si c'est un Beamer, afficher son explication
                 if isinstance(item, Beamer):
                     print(item.explain_usage())

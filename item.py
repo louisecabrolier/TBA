@@ -1,4 +1,4 @@
-import item
+
 class Item:
     def __init__(self, name, description, poids):
         self.name = name
