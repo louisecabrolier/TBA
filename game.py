@@ -1,6 +1,12 @@
 # Description: Game class
 
-
+#accès carnaval à simplifier pour commencer le jeu sinon tu sais pas où tu vas
+#rajouter objet carte
+#dire le but du jeu assez tôt
+#pas help si besoin d'aide mais help dès le début pour l'ensemble des commandes
+#changer nom endroit inconnu
+#bloquer l'accès au chateau avant d'avoir les objets
+#faire des phrases pour annoncer le lieu
 
 
 # Import modules
@@ -112,7 +118,7 @@ class Game:
 
         # Create exits for rooms
         foret.exits = {"N" : entreecite, "E" : None, "S" : None, "O" : None}
-        entreecite.exits = {"N" : alleeprincipale, "E" : maisonRDC, "S" : foret, "O" : None}
+        entreecite.exits = {"N" : alleeprincipale, "E" : maisonRDC, "S" : None, "O" : None}
         carnaval.exits = {"N" : piedmontagneouest, "E" : entreecite, "S" : bordcite, "O" : None}
         maisonRDC.exits = {"N" : marche, "E" : None, "S" : None, "O" : entreecite, "U" : None, "D": maisonsoussol}
         maisonsoussol.exits = {"N" : None, "E" : None, "S" : None, "O" : None, "U" : maisonRDC, "D" : None}
