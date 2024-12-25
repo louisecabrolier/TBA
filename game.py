@@ -1,12 +1,8 @@
 # Description: Game class
 
-#accès carnaval à simplifier pour commencer le jeu sinon tu sais pas où tu vas
-#rajouter objet carte
+#accès carnaval à simplifier pour commencer le jeu sinon tu sais pas où tu vas ni ce qu'il faut faire
 #dire le but du jeu assez tôt
-#pas help si besoin d'aide mais help dès le début pour l'ensemble des commandes
-#changer nom endroit inconnu
 #bloquer l'accès au chateau avant d'avoir les objets
-#faire des phrases pour annoncer le lieu
 
 
 # Import modules
@@ -73,9 +69,9 @@ class Game:
         check = Command("check", " : regarder dans son inventaire", Actions.check, 0)
         self.commands["check"]= check
         #beamer
-        charge = Command("charge", " : charger", Actions.charge, 0)
+        charge = Command("charge", " : charger le beamer", Actions.charge, 0)
         self.commands["charge"]= charge
-        teleporte = Command("teleporte", " :  se téléporter dans une pièce déjà visitée", Actions.teleporte, 0)
+        teleporte = Command("teleporte", " :  se téléporter dans une pièce déjà visitée avec le beamer", Actions.teleporte, 0)
         self.commands["teleporte"]= teleporte
         talk = Command("talk", " :  parler aux PNJ", Actions.talk, 1)
         self.commands["talk"]= talk
@@ -84,33 +80,33 @@ class Game:
 
 
         # Setup rooms
-        foret = Room("Forêt", "dans une forêt illuminée, BLABLABLA")
+        foret = Room("Forêt", "dans une forêt illuminée")
         self.rooms.append(foret)
-        entreecite = Room("Entrée de la cité", "entree cite")
+        entreecite = Room("Entrée de la cité", "à l'entrée de la cité")
         self.rooms.append(entreecite)
-        carnaval = Room("carnaval", "carnaval")
+        carnaval = Room("carnaval", "au carnaval")
         self.rooms.append(carnaval)
-        maisonRDC = Room("Rez-de-chaussé de la maison", "rdc maison")
+        maisonRDC = Room("Rez-de-chaussé de la maison", "au rez-de-chaussée de votre maison")
         self.rooms.append(maisonRDC)
-        maisonsoussol = Room("Sous-sol de la maison", "sous sol maison")
+        maisonsoussol = Room("Sous-sol de la maison", "dans le sous-sol de la maison")
         self.rooms.append(maisonRDC)
-        alleeprincipale = Room("Allée principale du village", "alle principale du village")
+        alleeprincipale = Room("Allée principale du village", "dans l'allée principale du village")
         self.rooms.append(alleeprincipale)
-        piedmontagneouest = Room("Pied de la montagne (Ouest)", "pied ouest de la montagne")
+        piedmontagneouest = Room("Pied de la montagne (Ouest)", "au pied ouest de la montagne")
         self.rooms.append(piedmontagneouest)
-        marche = Room("Marché", "marché")
+        marche = Room("Marché", "au marché")
         self.rooms.append(marche)
-        piedmonC = Room("Pied de la montagne (Centre)", "pied central de la montagne")
+        piedmonC = Room("Pied de la montagne (Centre)", "au pied central de la montagne")
         self.rooms.append(piedmonC)
-        monO = Room("Montagne (chemin Ouest)", "montagne coté ouest")
+        monO = Room("Montagne (chemin Ouest)", "sur la montagne coté ouest")
         self.rooms.append(monO)
-        chateau = Room("Château", "chateau")
+        chateau = Room("Château", "au château")
         self.rooms.append(chateau)
-        montagnesombre = Room("Montagne sombre", " montagne sombre")
+        montagnesombre = Room("Montagne sombre", "sur une montagne sombre")
         self.rooms.append(montagnesombre)
-        endroitinconnu = Room("Endroit inconnu","endroit inconnu")
+        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise")
         self.rooms.append(endroitinconnu)
-        bordcite = Room("Bord de la cité","bord de la cité")
+        bordcite = Room("Bord de la cité","au bord de la cité")
         self.rooms.append(bordcite)
 
 
@@ -259,7 +255,7 @@ class Game:
         # Vérification des conditions de défaite
         for condition in self.defeat_checker.CONDITIONS_DEF:
             if condition():
-                return "\nDÉFAITE: Vous avez atteri dans l'endroit inconnu!\n"
+                return "\nDÉFAITE: Vous êtes tombé de la falaise!\n"
 
         # Mise à jour des conditions de victoire basées sur l'état actuel
         self.update_victory_conditions()
@@ -359,7 +355,7 @@ class Game:
     # Print the welcome message
     def print_welcome(self):
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
-        print("Entrez 'help' si vous avez besoin d'aide.")
+        print("Entrez 'help' pour connaître les commandes du jeu.")
         print(self.player.current_room.get_long_description())
    
 
