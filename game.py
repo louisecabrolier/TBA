@@ -36,6 +36,9 @@ class Game:
         self.is_game_over = False
         self.door = Door()
         self.door_opened = False  # Pour suivre si la porte a déjà été ouverte
+        self.limited_exits = True  # Contrôle des sorties limitées au début du jeu
+        self.carnaval_first_visit = True  # Initialement, le Carnaval n'a pas été visité
+
 
         
 
@@ -114,7 +117,7 @@ class Game:
 
         # Create exits for rooms
         foret.exits = {"N" : entreecite, "E" : None, "S" : None, "O" : None}
-        entreecite.exits = {"N" : alleeprincipale, "E" : maisonRDC, "S" : None, "O" : None}
+        entreecite.exits = {"N" : alleeprincipale, "E" : maisonRDC, "S" : None, "O" : carnaval}
         carnaval.exits = {"N" : piedmontagneouest, "E" : entreecite, "S" : bordcite, "O" : None}
         maisonRDC.exits = {"N" : marche, "E" : None, "S" : None, "O" : entreecite, "U" : None, "D": maisonsoussol}
         maisonsoussol.exits = {"N" : None, "E" : None, "S" : None, "O" : None, "U" : maisonRDC, "D" : None}
@@ -315,6 +318,11 @@ class Game:
                 return
 
             list_of_words[1] = direction
+            if self.limited_exits == True:
+                # Restriction des sorties
+                if self.player.current_room == self.entreecite and direction not in {"O"}:
+                    print("Vous ne pouvez aller qu'à l'ouest pour l'instant.")
+                    return
 
             # Vérifier si on est dans la forêt et qu'on va vers la cité
             if self.player.current_room == self.foret and direction == "N":
@@ -342,6 +350,15 @@ class Game:
             next_room = self.player.current_room.exits.get(direction)
             if next_room and next_room.name == "Endroit inconnu":  # Vérifie le nom de la salle
                 self.defeat_checker.update_condition(True)
+
+            # Levée des restrictions une fois au carnaval
+            if next_room.name == "Carnaval":
+                    self.limited_exits = False
+
+            if next_room == self.carnaval and self.carnaval_first_visit:
+                print("\nBienvenue au Carnaval ! Utilisez 'look' pour observer autour de vous.")
+                print("Parlez aux différentes personnes que vous verrez pour en savoir plus sur le jeu.")
+                self.carnaval_first_visit = False  # Mettre à jour le drapeau
 
         if command_word not in self.commands.keys():
             print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
