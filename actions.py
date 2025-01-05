@@ -576,4 +576,71 @@ class Actions:
 
             print(f"\nIl n'y a personne qui s'appelle '{npc_name}' dans les environs.\n")
             return False
+    
+
+    def give(game, list_of_words, number_of_parameters):
+        """
+        Permet au joueur de donner un objet à un PNJ.
+        Usage: give <personnage> <objet>
+        """
+        if len(list_of_words) != 3:  # commande + destinataire + objet
+            print("Usage : give <personnage> <objet>")
+            return False
+
+        target = list_of_words[1].lower()
+        item_name = list_of_words[2].lower()
+        current_room = game.player.current_room
+
+        # Vérifier si le garde est dans la pièce actuelle
+        #garde_present = False
+        #for npc in current_room.inventory.npcs.values():
+            #if npc.name.lower() == "garde":
+                #garde_present = True
+                #break
         
+        #if not garde_present:
+            #print("Le garde est au chateau.")
+            #return False
+
+        # Vérifier si l'objet est dans l'inventaire du joueur
+        item_found = None
+        for name, data in game.player.inventory.items.items():
+            if name.lower() == item_name:
+                item_found = data["item"]
+                break
+
+        if not item_found:
+            print(f"Vous n'avez pas de {item_name} dans votre inventaire.")
+            return False
+
+        # Logique pour le garde
+        if target == "garde":
+            # Cas de la potion
+            if item_name == "potion":
+                game.player.inventory.remove_item("potion")
+                game.victory_checker.garde_convinced = True
+                print("Le garde accepte votre potion et vous laisse entrer dans le château.")
+                return True
+
+            # Cas de la pierre et de la bague
+            elif item_name in ["pierre", "bague"]:
+                # Vérifier si le joueur a les deux objets
+                has_pierre = any(name.lower() == "pierre" for name in game.player.inventory.items)
+                has_bague = any(name.lower() == "bague" for name in game.player.inventory.items)
+                
+                if has_pierre and has_bague:
+                    # Retirer les deux objets
+                    for name in ["pierre", "bague"]:
+                        game.player.inventory.remove_item(name)
+                    game.victory_checker.garde_convinced = True
+                    print("Le garde accepte vos objets et vous laisse entrer dans le château.")
+                    return True
+                else:
+                    print("Le garde a besoin des deux objets (pierre et bague) pour être convaincu.")
+                    return False
+
+            print("Le garde n'est pas intéressé par cet objet.")
+            return False
+        else:
+            print(f"Vous ne pouvez pas donner d'objet à {target}.")
+            return False
