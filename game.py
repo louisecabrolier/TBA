@@ -18,8 +18,7 @@ from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
 from door import Door
 from interfacegraphique import GameGUI 
-#from CheckVictory import CONDITIONS_VICT
-#from CheckDefeat import CONDITIONS_DEF
+
 
 class Game:
 
@@ -147,19 +146,19 @@ class Game:
 
 
 
-        pierre = Item("Pierre scintillante", "une étrange pierre aux lueurs violettes", 2)
+        pierre = Item("Pierre", "une étrange pierre scintillante aux lueurs violettes", 2)
         branche = Item("Branche", "une lourde branche d'arbre", 3)
         potion = Item("Potion", "une potion magique qui va t'aider", 1)
         beamer = Beamer("Beamer", "un objet magique qui vous permet de vous téléporter", 3)
         mushroom = Item("Champignon", "un champignon doré très rare", 1)
-        key = Item("Clef", "la clé qui permet d'ouvrir les portes de la cité", 1)
+        key = Item("Clef", "la clef qui permet d'ouvrir les portes de la cité", 1)
         tapis = Item("Tapis", "Un tapis lourd et poussiereux", 5)
         bague = Item("Bague", "Une belle bague précieuse", 1)
 
 
 
         # Ajout des items à l'inventaire des lieux directement via le dictionnaire
-        foret.inventory["pierre scintillante"] = pierre
+        foret.inventory["pierre"] = pierre
         foret.inventory["branche"] = branche
         maisonsoussol.inventory["beamer"] = beamer
         carnaval.inventory.items["potion"] = {"item": potion, "hidden": True} #potion cachée au début avant de parler au medecin
@@ -239,42 +238,82 @@ class Game:
     def check_game_state(self):
         """Vérifie l'état du jeu et retourne un message si le jeu est terminé"""
         # Vérification des conditions de défaite
-        for condition in self.defeat_checker.CONDITIONS_DEF:
-            if condition():
-                return "\nDÉFAITE: Vous êtes tombé de la falaise!\n"
+        defeat_conditions = [
+            (self.defeat_checker.endroitinconnu, "\nDÉFAITE: Vous êtes tombé de la falaise!\n"),
+            (self.defeat_checker.talk_to_villageois, "\nDÉFAITE: Vous avez été infecté par le villageois!\n")
+        ]
+        
+        for condition, message in defeat_conditions:
+            if condition():  # Si la condition de défaite est remplie
+                return message
 
         # Mise à jour des conditions de victoire basées sur l'état actuel
         self.update_victory_conditions()
 
         # Vérification des conditions de victoire
         if all(condition() for condition in self.victory_checker.CONDITIONS_VICT):
-            return "\nVICTOIRE: Félicitations, vous avez accompli votre quête!\n"
+            return "\nVICTOIRE: Félicitations, vous avez accompli votre quête!"
 
         return None
 
-    def update_victory_conditions(self):
+    def update_victory_conditions(self, show_validation=True):
         """Met à jour les conditions de victoire basées sur l'état actuel du jeu"""
-        # Vérifie si le joueur est dans le château
-        self.victory_checker.update_condition("chateau", 
-            self.player.current_room.name == "chateau")
-        
-        # Vérifie si le joueur a parlé à l'annonceur
-        # Supposons que nous gardons une trace des interactions dans player
+        is_in_chateau = self.player.current_room.name.lower() == "chateau"
+        self.victory_checker.update_condition("chateau", is_in_chateau)
+        if show_validation:
+            if is_in_chateau:
+                print("Condition validée: Vous êtes dans le château.")
+            else:
+                print("Condition non validée: Vous n'êtes pas encore dans le château.")
+
+        # Vérification des objets dans l'inventaire du joueur (insensible à la casse)
+        has_potion = any(item.lower() == "potion" for item in self.player.inventory.items)
+        self.victory_checker.update_condition("potion", has_potion)
+        if show_validation:
+            if has_potion:
+                print("Condition validée: Vous avez la potion.")
+            else:
+                print("Condition non validée: Vous n'avez pas la potion.")
+            
+        has_pierre = any(item.lower() == "pierre" for item in self.player.inventory.items)
+        self.victory_checker.update_condition("pierre", has_pierre)
+        if show_validation:
+            if has_pierre:
+                print("Condition validée: Vous avez la pierre.")
+            else:
+                print("Condition non validée: Vous n'avez pas la pierre.")
+            
+        has_bague = any(item.lower() == "bague" for item in self.player.inventory.items)
+        self.victory_checker.update_condition("bague", has_bague)
+        if show_validation:
+            if has_bague:
+                print("Condition validée: Vous avez la bague.")
+            else:
+                print("Condition non validée: Vous n'avez pas la bague.")
+
+        # Vérification des dialogues
+        self.victory_checker.update_condition("annonceur",
+            getattr(self.player, 'has_talked_to_annonceur', False))
+        self.victory_checker.update_condition("garde", 
+            getattr(self.player, 'garde_talked', False))
+
         if hasattr(self.player, 'has_talked_to_annonceur'):
-            self.victory_checker.update_condition("annonceur", 
-                self.player.has_talked_to_annonceur)
-        
-        # Vérifie si le joueur a l'objet requis
-        required_object = "objet_spécifique"  # À adapter selon votre jeu
-        if hasattr(self.player, 'inventory'):
-            self.victory_checker.update_condition("object",
-                required_object in self.player.inventory.items)
+            self.victory_checker.update_condition("annonceur", self.player.has_talked_to_annonceur)
+            if show_validation:
+                if self.player.has_talked_to_annonceur:
+                    print("Condition validée: Vous avez parlé à l'annonceur.")
+                else:
+                    print("Condition non validée: Vous n'avez pas parlé à l'annonceur.")
+    
+        if hasattr(self.player, 'garde_talked'):
+            self.victory_checker.update_condition("garde", self.player.garde_talked)
+            if show_validation:
+                if self.player.garde_talked:
+                    print("Condition validée: Vous avez parlé au garde.")
+                else:
+                    print("Condition non validée: Vous n'avez pas parlé au garde.")
         
 
-        # Vérifie si le joueur a parlé au garde
-        if hasattr(self.player, 'has_talked_to_garde'):
-            self.victory_checker.update_condition("garde",
-                self.player.has_talked_to_garde)
 
     def process_command(self, command_string) -> None:
         # Code existant...
@@ -348,6 +387,25 @@ class Game:
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
+
+        # Si la commande est "talk annonceur"
+        command_text = getattr(command, 'text', str(command))  # Récupère le texte ou convertit en string si nécessaire
+        if command_text.lower().startswith("talk annonceur"):
+            # Interaction avec l'annonceur
+            print("\nAnnonceur (dans carnaval) : Que tout le monde aille vite se réfugier au château ! Un terrible virus va nous tuer!")
+            print("\n* Les autres visiteurs du carnaval commencent à apparaître autour de toi... *")
+            print("\nN'hésite pas à interagir avec les habitants, ce qu'ils ont à t'offrir sera peut-être utile dans ta quête vers le château.")
+
+            # Mise à jour de l'état du joueur pour indiquer qu'il a parlé à l'annonceur
+            self.player.has_talked_to_annonceur = True
+
+            # Mise à jour de la condition de victoire
+            self.victory_checker.update_condition("annonceur", self.player.has_talked_to_annonceur)
+            print("Condition validée: Vous avez parlé à l'annonceur.")
+            return True  # La commande a été traitée
+
+        
+        return False  # Si la commande n'est pas reconnue ou traitée
 
 
 

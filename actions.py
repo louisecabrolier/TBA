@@ -388,23 +388,29 @@ class Actions:
             return False
 
         # Récupérer l'objet à prendre
-        item_name = list_of_words[1]
+        item_name = list_of_words[1].lower()  # Normaliser le nom de l'objet saisi
         current_room = game.player.current_room
 
         # Chercher l'objet dans l'inventaire de la pièce
         visible_items = current_room.inventory.get_visible_items()
-        if item_name in visible_items:
-            item = visible_items[item_name]  # Now this is the actual Item object
-            
+
+        # Chercher l'item sans tenir compte de la casse
+        item_found = None
+        for name, item in visible_items.items():
+            if name.lower() == item_name:  # Comparaison insensible à la casse
+                item_found = item
+                break
+
+        if item_found:
             # Vérifier le poids de l'objet
-            if game.player.get_current_weight() + item.poids > game.player.max_poids: 
+            if game.player.get_current_weight() + item_found.poids > game.player.max_poids: 
                 print("Vous avez trop de poids, vous ne pouvez pas prendre cet objet.")
                 return False
             
             # Ajouter l'objet à l'inventaire du joueur
-            game.player.inventory.add_item(item)
+            game.player.inventory.add_item(item_found)
             current_room.inventory.remove_item(item_name)
-            print(f"Vous avez pris {item.name}.")
+            print(f"Vous avez pris {item_found.name}.")
             return True
         else:
             print(f"L'objet '{item_name}' n'est pas dans cette pièce.")
@@ -413,24 +419,27 @@ class Actions:
 
 
 
-
-
     def drop(game, list_of_words, number_of_parameters):
         if len(list_of_words) < 2:
             print("Que voulez-vous déposer ?")
         else:
-            item_name = list_of_words[1]
+            item_name = list_of_words[1].lower()  # Normaliser le nom de l'item
             player = game.player
-           
-            # Chercher l'item dans l'inventaire du joueur
-            if item_name in player.inventory.items:
-                item_to_drop = player.inventory.items[item_name]
-           
-                # Retirer du dict du joueur
-                del player.inventory.items[item_name]
-                # Ajouter au set de la pièce
-                player.current_room.inventory.add_item(item_to_drop)
-                print(f"Vous avez déposé l'objet '{item_name}'")
+            
+
+            # Chercher l'item dans l'inventaire du joueur, en prenant en compte la casse
+            item_found = None
+            for name, data in player.inventory.items.items():
+                if name.lower() == item_name:  # Comparaison insensible à la casse
+                    item_found = data["item"]
+                    break
+            
+            if item_found:
+                # Retirer l'item de l'inventaire du joueur
+                del player.inventory.items[name]  # Utilise le nom trouvé
+                # Ajouter l'item à l'inventaire de la pièce
+                player.current_room.inventory.add_item(item_found)
+                print(f"Vous avez déposé l'objet '{name}'")
             else:
                 print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
 
@@ -464,10 +473,14 @@ class Actions:
 
     def check(game, list_of_words, number_of_parameters):
         """ Affiche le contenu de l'inventaire du joueur """
-        if len(list_of_words) == 1:  # Si seul le mot 'check' est présent
-            game.player.check()  # Appelle la méthode check() du joueur
+        if not game.player.inventory.items:
+            print("Votre inventaire est vide")
         else:
-            print("Commande incorrecte. Utilisez simplement 'check' pour voir votre inventaire.")
+            print("Votre inventaire contient :")
+            for item_name, data in game.player.inventory.items.items():
+                # Accède à l'instance de l'objet dans le dictionnaire
+                item = data["item"]
+                print(f"- {item_name}: {item.description} ({item.poids} kg)")
 
     
 

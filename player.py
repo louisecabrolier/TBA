@@ -15,6 +15,9 @@ class Player():
         self.inventory = Inventory()
         self.max_poids = 10  # Poids maximum en kg
         self.has_spoken_to_merchant = False  # Indique si le joueur a parlé au marchand
+        self.has_talked_to_annonceur = False
+        self.has_talked_to_garde = False
+       
 
 
     # Define the move method.
@@ -98,8 +101,8 @@ class Player():
 
         
 
-    def talk_to_merchant(self):
-        self.has_spoken_to_merchant = True  # Met à jour l'état de la conversation
+    #def talk_to_médecin(self):
+        #self.has_spoken_to_médecin = True  # Met à jour l'état de la conversation
         # Vous pouvez également rendre un objet révélé ici si nécessaire
         # Exemple : current_room.inventory.items["potion"]["item"].revealed = True
 
