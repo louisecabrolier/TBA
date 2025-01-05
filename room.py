@@ -4,7 +4,7 @@ class Room:
 
 
     # Define the constructor.
-    def __init__(self, name, description, image = None #allows_dropping=True):
+    def __init__(self, name, description, image = None): #allows_dropping=True):
         self.name = name
         self.description = description
         self.exits = {}

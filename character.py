@@ -6,7 +6,7 @@ class Character:
     """
     Classe pour représenter les personnages non joueurs (PNJ).
     """
-    def __init__(self, name, description, current_room, msgs):
+    def __init__(self, name, description, current_room, msgs, visible = True):
         """
         Initialise un PNJ.
 
@@ -22,6 +22,7 @@ class Character:
         self.msgs = msgs.copy()  # Liste originale des messages
         self._current_msgs = msgs.copy()  # Liste des messages courants
         self.has_spoken = False  # Par défaut, le joueur n'a pas encore parlé
+        self.visible = visible  # Nouvel attribut
 
     def __str__(self):
         """

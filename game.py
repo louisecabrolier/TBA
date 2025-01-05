@@ -162,10 +162,10 @@ class Game:
         foret.inventory["pierre scintillante"] = pierre
         foret.inventory["branche"] = branche
         maisonsoussol.inventory["beamer"] = beamer
-        carnaval.inventory.items["potion"] = {"item": potion, "hidden": True} #potion cachée au début avant de parler au marchand
+        carnaval.inventory.items["potion"] = {"item": potion, "hidden": True} #potion cachée au début avant de parler au medecin
         foret.inventory["champignon"] = mushroom
         foret.inventory["clef"] = key
-        carnaval.inventory["tapis"] = tapis #truc que la vendeuse lui donne au carnaval
+        carnaval.inventory.items["tapis"] = {"item": tapis, "hidden": True} #truc que la vendeuse lui donne au carnaval
         marche.inventory["bague"] = bague #marchand
 
 
@@ -173,13 +173,13 @@ class Game:
 
         # Création des personnages
 
-        bouffon = Character("Bouffon", "Le bouffon du roi", carnaval, ["Le roi m'a envoyé dans la ville pour me ressourcer", "Le roi est si gentil.", "Ce carnaval est superbe ! Je me sens inspiré"])
-        medecin = Character("Médecin", "Un médecin", carnaval, ["Tiens toi! Prends la potion que j'ai mise sur la table !", "Je dois aller guérir les nouveaux malades ! Dépêche toi !", "Satanée infection!!"])
-        vendeuse = Character("Vendeuse", "Une vendeuse", carnaval, ["Prends ce tapis", "Tu peux me faire confiance, il est superbe et de grande valeur!"])
-        annonceur = Character("Annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Que tout le monde aille vite se réfugier au château ! Un terrible virus va nous tuer!"])
-        villageois = Character("Villageois", "Un villageois à l'apparence suspecte et décrépite", entreecite, ["Hgrhh...Je me sens mal..."])
-        garde = Character("Garde", "Le garde du chateau", chateau, ["Il y a trop de monde, je ne peux vous laisser passer, à moins que vous ayez quelque chose pour me convaincre?"])
-        marchand = Character("Vieux marchand", "Un marchand", marche, ["Un objet qui te seras utile est pour toi, il se trouve dans cette pièce"])
+        bouffon = Character("Bouffon", "Le bouffon du roi", carnaval, ["Le roi m'a envoyé dans la ville pour me ressourcer", "Le roi est si gentil.", "Ce carnaval est superbe ! Je me sens inspiré"], visible = False)
+        medecin = Character("Médecin", "Un médecin", carnaval, ["Tiens toi! Prends la potion que j'ai mise sur la table !", "Je dois aller guérir les nouveaux malades ! Dépêche toi !", "Satanée infection!!"], visible = False)
+        vendeuse = Character("Vendeuse", "Une vendeuse", carnaval, ["Prends ce tapis", "Tu peux me faire confiance, il est superbe et de grande valeur!"], visible = False)
+        annonceur = Character("Annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Que tout le monde aille vite se réfugier au château ! Un terrible virus va nous tuer!"], visible = True)
+        villageois = Character("Villageois", "Un villageois à l'apparence suspecte et décrépite", entreecite, ["Hgrhh...Je me sens mal..."], visible = False)
+        garde = Character("Garde", "Le garde du chateau", chateau, ["Il y a trop de monde, je ne peux vous laisser passer, à moins que vous ayez quelque chose pour me convaincre?"], visible = False)
+        marchand = Character("Vieux marchand", "Un marchand", marche, ["Un objet qui te seras utile est pour toi, il se trouve dans cette pièce"], visible = False)
 
         # Liste des personnages pour le jeu
 

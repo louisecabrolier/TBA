@@ -352,26 +352,24 @@ class Actions:
     def look(game, list_of_words, number_of_parameters):
         """
         Permet au joueur de regarder autour de lui ou un objet spécifique.
+        Ne montre que les PNJ visibles (annonceur au début, puis tous après lui avoir parlé).
         """
         current_room = game.player.current_room
-        
         # Description de la pièce
         print(current_room.description)
-        
-        # Afficher les objets visibles
-        print("\nObjets visibles :")
-        for name, data in current_room.inventory.items.items():
-            # Vérifier si l'objet n'est pas caché
-            if not data["hidden"]:
-                item = data["item"]
+
+        if current_room.inventory.get_visible_items():
+            print("\nObjets visibles :")
+            for item in current_room.inventory.get_visible_items().values():
                 print(f" - {item.name} : {item.description}")
-        
-        # Afficher les PNJ
-        if current_room.inventory.npcs:
+
+        # Afficher uniquement les PNJ visibles
+        visible_npcs = [npc for npc in current_room.inventory.npcs.values() if npc.visible]
+        if visible_npcs:
             print("\nPersonnages :")
-            for npc in current_room.inventory.npcs.values():
+            for npc in visible_npcs:
                 print(f" - {npc.name} : {npc.description}")
-        
+
         return True
 
 
@@ -493,16 +491,15 @@ class Actions:
 
             beamer.teleporte(player)
 
-
-
     def talk(game, list_of_words, number_of_parameters):
         """
         Permet au joueur d'interagir avec un PNJ.
+        Les PNJ supplémentaires apparaissent après avoir parlé à l'annonceur.
         """
         if len(list_of_words) < 2:
             print("Parler à qui ?")
             return False
-        
+
         # Récupérer le nom du PNJ avec la casse d'origine
         npc_name = ' '.join(list_of_words[1:])
         current_room = game.player.current_room
@@ -510,31 +507,60 @@ class Actions:
         # Chercher le PNJ dans la pièce actuelle en ignorant la casse
         found_npc = None
         for npc in current_room.inventory.npcs.values():
+            # Vérifier si le PNJ est visible (s'il a cet attribut)
+            if hasattr(npc, 'visible') and not npc.visible:
+                continue
+                    
             if npc.name.lower() == npc_name.lower():
                 found_npc = npc
                 break
 
         if found_npc:
-            # Afficher le message du PNJ
+            # Obtenir le message du PNJ
             message = found_npc.get_msg()
             print(f"\n{found_npc.name} (dans {found_npc.current_room.name}) : {message}\n")
-            
-            # Si le PNJ est le marchand, révéler la potion cachée
-            if found_npc.name.lower() == "marchand":
-                potion_data = current_room.inventory.items.get("potion")  # Récupérer la potion
-                if potion_data and potion_data["hidden"]:  # Si la potion est cachée
-                    potion_data["hidden"] = False  # Révéler la potion
-                    print("Le marchand vous montre une potion cachée dans cette pièce !")
-            
+
+            # Si c'est l'annonceur et que c'est la première conversation
+            if found_npc.name.lower() == "annonceur" and not hasattr(game, 'talked_to_announcer'):
+                game.talked_to_announcer = True
+                    
+                # Faire apparaître les autres PNJ
+                for room in game.rooms:
+                    for npc in room.inventory.npcs.values():
+                        if hasattr(npc, 'visible'):
+                            npc.visible = True
+                    
+                # Message spécial après avoir parlé à l'annonceur
+                print("\n* Les autres visiteurs du carnaval commencent à apparaître autour de toi... *")
+                print("\nN'hésite pas à intéragir avec les habitants, ce qu'ils ont à t'offrir sera peut être utile dans ta quête vers le château.\n")
+
+            elif found_npc.name.lower() == "médecin":
+                # Révéler la potion si elle est présente et cachée
+                if "potion" in current_room.inventory.items:
+                    current_room.inventory.reveal_item("potion")
+                    print("Le médecin te montre une potion cachée dans cette pièce !")
+
+            elif found_npc.name.lower() == "vendeuse":
+                # Révéler le tapis si présent et caché
+                if "tapis" in current_room.inventory.items:
+                    current_room.inventory.reveal_item("tapis")
+                    print("La vendeuse te montre un tapis caché dans cette pièce !")
+
+
             return True
+
         else:
             # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
             for room in game.rooms:
                 for npc in room.inventory.npcs.values():
+                    # Ne pas mentionner les PNJ invisibles
+                    if hasattr(npc, 'visible') and not npc.visible:
+                        continue
+                            
                     if npc.name.lower() == npc_name.lower():
                         print(f"\n{npc.name} n'est pas ici. Il/Elle se trouve dans : {room.name}\n")
                         return False
 
             print(f"\nIl n'y a personne qui s'appelle '{npc_name}' dans les environs.\n")
             return False
-
+        
