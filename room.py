@@ -4,12 +4,13 @@ class Room:
 
 
     # Define the constructor.
-    def __init__(self, name, description):
+    def __init__(self, name, description, image = None):
         self.name = name
         self.description = description
         self.exits = {}
         self.inventory = Inventory()
         self.characters = {}
+        self.image = image 
    
     # Define the get_exit method.
     def get_exit(self, direction):
@@ -29,19 +30,6 @@ class Room:
                 exit_string += exit + ", "
         exit_string = exit_string.strip(", ")
         return exit_string
- 
-    #def get_inventory(self):
-    #   inventory = []
-        # Ajouter les items
-    #   for item in self.items:
-    #        inventory.append(f"- {item.name} : {item.description}")
-
-        # Ajouter les personnages non joueurs
-    #    for character in self.characters:
-    #        inventory.append(f"- {character.name} : {character.description}")
-
-        # Construire la sortie
-     #   return "On voit:\n" + "\n".join(inventory) if inventory else "Il n'y a rien ici."
 
 
     def get_inventory(self):
@@ -51,18 +39,6 @@ class Room:
         :return: Chaîne de caractères listant les items.
         """
         return self.inventory
-        #return self.inventory.get_inventory()
-       # output = "On voit :"
-        #if self.inventory:
-            #for name, item in self.inventory.items():
-                #output += f"\n    - {name} : {item.description}"
-        #if self.characters:
-            #for name, character in self.characters.items():
-                #output += f"\n    - {name} : {character.description}"
-        #if not self.inventory and not self.characters:
-            #output += "\n    Il n'y a rien ici."
-        #return output
-
 
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"

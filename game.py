@@ -17,13 +17,11 @@ from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
 from door import Door
+from interfacegraphique import GameGUI 
 #from CheckVictory import CONDITIONS_VICT
 #from CheckDefeat import CONDITIONS_DEF
 
 class Game:
-
-
-
 
     # Constructor
     def __init__(self):
@@ -40,15 +38,8 @@ class Game:
         self.carnaval_first_visit = True  # Initialement, le Carnaval n'a pas été visité
 
 
-        
-
-    
-
     # Setup the game
     def setup(self):
-
-
-
 
         # Setup commands
         help = Command("help", " : afficher cette aide", Actions.help, 0)
@@ -83,7 +74,7 @@ class Game:
 
 
         # Setup rooms
-        foret = Room("Forêt", "dans une forêt illuminée")
+        foret = Room("Forêt", "dans une forêt illuminée", "dessin/foret.png")
         self.rooms.append(foret)
         entreecite = Room("Entrée de la cité", "à l'entrée de la cité")
         self.rooms.append(entreecite)
@@ -139,7 +130,7 @@ class Game:
         self.player.current_room = foret
 
 
-        self.foret = foret  # Store room as instance attribute
+        self.foret = foret
         self.entreecite = entreecite
         self.carnaval = carnaval
         self.chateau = chateau
@@ -162,7 +153,7 @@ class Game:
         potion = Item("potion", "une potion magique qui va t'aider", 1)
         beamer = Beamer("beamer", "un objet magique qui permet la téléportation", 1)
         mushroom = Item("mushroom", "un champignon doré très rare", 1)
-        key = Item("key", "une clé qui permet d'ouvrir les portes de la cité", 1)
+        key = Item("key", "la clé qui permet d'ouvrir les portes de la cité", 1)
 
 
         # Ajout des items à l'inventaire des lieux directement via le dictionnaire
@@ -174,11 +165,6 @@ class Game:
         foret.inventory["mushroom"] = mushroom
         foret.inventory["key"] = key
 
-    
-        
-
-
-     
 
         #PNJ
 
@@ -189,7 +175,7 @@ class Game:
         vendeuse = Character("vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
         annonceur = Character("annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
         pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["Tu perds ton temps à me parler", "on espère que la démo vous plaît"])
-        garde = Character("garde", "Le garde du chateau", chateau, ["Peux-tu me donner l'objet nécessaire pour entrer"])
+        garde = Character("garde", "Le garde du chateau", chateau, ["Peux-tu me donner l'objet nécessaire pour entrer?"])
         marchand = Character("marchand", "Un marchand", marche, ["Un objet utile pour toi se trouve dans cette pièce"])
 
         # Liste des personnages pour le jeu
@@ -207,14 +193,8 @@ class Game:
         self.marche.inventory.add_npc(marchand)
 
         #Faire bouger les PNJ
-        #bouffon.move()
-        #medecin.move()
-        #vendeuse.move()
-        #annonceur.move()
         pnj.move()
 
-
-    
     def play(self):
         self.setup()
         self.print_welcome()
@@ -377,16 +357,31 @@ class Game:
    
 
 
-def main():
-    # Create a game object and play the game
-    Game().play()
-   
+    def main():
+        print("Bienvenue dans le jeu !")
+        mode = input("Choisissez un mode : 'console' ou 'gui' : ").strip().lower()
 
-
-
+        if mode == "gui":
+            print("Lancement de l'interface graphique...")
+            from interfacegraphique import GameGUI
+            game = Game()  # Create a new game instance
+            app = GameGUI(game)  # Pass the game instance to GameGUI
+            app.run()
+        else:
+            print("Lancement en mode console...")
+            game = Game()
+            game.play()
 
 if __name__ == "__main__":
-    main()
+    Game.main()  # Call the static main method directly
+
+
+#def main():
+    # Create a game object and play the game
+    #Game().play()
+#if __name__ == "__main__":
+
+    #main()
 
 
 
