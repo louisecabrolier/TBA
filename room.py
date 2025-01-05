@@ -4,13 +4,15 @@ class Room:
 
 
     # Define the constructor.
-    def __init__(self, name, description, image = None):
+    def __init__(self, name, description, image = None #allows_dropping=True):
         self.name = name
         self.description = description
         self.exits = {}
         self.inventory = Inventory()
         self.characters = {}
-        self.image = image 
+        self.image = image
+        #self.allows_dropping = allows_dropping  # Par défaut, les pièces autorisent le dépôt d'objets
+
    
     # Define the get_exit method.
     def get_exit(self, direction):

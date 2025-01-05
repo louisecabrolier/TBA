@@ -76,7 +76,7 @@ class Game:
         # Setup rooms
         foret = Room("Forêt", "dans une forêt illuminée", "dessin/foret.png")
         self.rooms.append(foret)
-        entreecite = Room("Entrée de la cité", "à l'entrée de la cité")
+        entreecite = Room("Entrée de la cité", "à l'entrée de la cité, les portes de la cité sont maintenant scellées")
         self.rooms.append(entreecite)
         carnaval = Room("carnaval", "au carnaval")
         self.rooms.append(carnaval)
@@ -147,40 +147,43 @@ class Game:
 
 
 
-        shield = Item("shield", "un bouclier léger et résistant", 5)
-        helmet = Item("helmet", "un casque en métal", 6)
-        branche = Item("branche", "une branche d'arbre", 1)
-        potion = Item("potion", "une potion magique qui va t'aider", 1)
-        beamer = Beamer("beamer", "un objet magique qui permet la téléportation", 1)
-        mushroom = Item("mushroom", "un champignon doré très rare", 1)
-        key = Item("key", "la clé qui permet d'ouvrir les portes de la cité", 1)
+        pierre = Item("Pierre scintillante", "une étrange pierre aux lueurs violettes", 2)
+        branche = Item("Branche", "une lourde branche d'arbre", 3)
+        potion = Item("Potion", "une potion magique qui va t'aider", 1)
+        beamer = Beamer("Beamer", "un objet magique qui vous permet de vous téléporter", 3)
+        mushroom = Item("Champignon", "un champignon doré très rare", 1)
+        key = Item("Clef", "la clé qui permet d'ouvrir les portes de la cité", 1)
+        tapis = Item("Tapis", "Un tapis lourd et poussiereux", 5)
+        bague = Item("Bague", "Une belle bague précieuse", 1)
+
 
 
         # Ajout des items à l'inventaire des lieux directement via le dictionnaire
-        foret.inventory["shield"] = shield
-        foret.inventory["helmet"] = helmet
-        entreecite.inventory["branche"] = branche
-        foret.inventory["beamer"] = beamer
-        marche.inventory.items["potion"] = {"item": potion, "hidden": True} #potion cachée au début avant de parler au marchand
-        foret.inventory["mushroom"] = mushroom
-        foret.inventory["key"] = key
+        foret.inventory["pierre scintillante"] = pierre
+        foret.inventory["branche"] = branche
+        maisonsoussol.inventory["beamer"] = beamer
+        carnaval.inventory.items["potion"] = {"item": potion, "hidden": True} #potion cachée au début avant de parler au marchand
+        foret.inventory["champignon"] = mushroom
+        foret.inventory["clef"] = key
+        carnaval.inventory["tapis"] = tapis #truc que la vendeuse lui donne au carnaval
+        marche.inventory["bague"] = bague #marchand
 
 
         #PNJ
 
         # Création des personnages
 
-        bouffon = Character("bouffon", "Le bouffon du roi", carnaval, ["J'ai quelque chose pour toi."])
-        medecin = Character("medecin", "Un médecin random", carnaval, ["J'ai quelque chose pour t'aider dans ta quête"])
-        vendeuse = Character("vendeuse", "Une vendeuse", carnaval, ["T'as fait tes affaires"])
-        annonceur = Character("annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Infection !"," Il faut se réfugier au château"])
-        pnj = Character("pnj", "Un pnj qui sert à rien", entreecite, ["Tu perds ton temps à me parler", "on espère que la démo vous plaît"])
-        garde = Character("garde", "Le garde du chateau", chateau, ["Peux-tu me donner l'objet nécessaire pour entrer?"])
-        marchand = Character("marchand", "Un marchand", marche, ["Un objet utile pour toi se trouve dans cette pièce"])
+        bouffon = Character("Bouffon", "Le bouffon du roi", carnaval, ["Le roi m'a envoyé dans la ville pour me ressourcer", "Le roi est si gentil.", "Ce carnaval est superbe ! Je me sens inspiré"])
+        medecin = Character("Médecin", "Un médecin", carnaval, ["Tiens toi! Prends la potion que j'ai mise sur la table !", "Je dois aller guérir les nouveaux malades ! Dépêche toi !", "Satanée infection!!"])
+        vendeuse = Character("Vendeuse", "Une vendeuse", carnaval, ["Prends ce tapis", "Tu peux me faire confiance, il est superbe et de grande valeur!"])
+        annonceur = Character("Annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Que tout le monde aille vite se réfugier au château ! Un terrible virus va nous tuer!"])
+        villageois = Character("Villageois", "Un villageois à l'apparence suspecte et décrépite", entreecite, ["Hgrhh...Je me sens mal..."])
+        garde = Character("Garde", "Le garde du chateau", chateau, ["Il y a trop de monde, je ne peux vous laisser passer, à moins que vous ayez quelque chose pour me convaincre?"])
+        marchand = Character("Vieux marchand", "Un marchand", marche, ["Un objet qui te seras utile est pour toi, il se trouve dans cette pièce"])
 
         # Liste des personnages pour le jeu
 
-        self.characters = [bouffon, medecin, vendeuse, annonceur, pnj, garde, marchand]
+        self.characters = [bouffon, medecin, vendeuse, annonceur, villageois, garde, marchand]
 
 
         # Ajout des PNJ à la pièce
@@ -188,12 +191,12 @@ class Game:
         self.carnaval.inventory.add_npc(medecin)
         self.carnaval.inventory.add_npc(vendeuse)
         self.carnaval.inventory.add_npc(annonceur)
-        self.entreecite.inventory.add_npc(pnj)
+        self.entreecite.inventory.add_npc(villageois)
         self.chateau.inventory.add_npc(garde)
         self.marche.inventory.add_npc(marchand)
 
         #Faire bouger les PNJ
-        pnj.move()
+        villageois.move()
 
     def play(self):
         self.setup()
@@ -308,7 +311,7 @@ class Game:
             if self.player.current_room == self.foret and direction == "N":
                 if not self.door_opened:  # Si la porte n'a pas encore été ouverte
                     # Vérifier si le joueur a la clé
-                    has_key = "key" in self.player.inventory.items  # items est un dictionnaire, pas une méthode
+                    has_key = "Clef" in self.player.inventory.items  # items est un dictionnaire, pas une méthode
                     if not has_key:
                         print("\nVous ne pouvez pas entrer dans la cité sans la clé.\n")
                         return

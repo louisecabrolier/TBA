@@ -436,6 +436,32 @@ class Actions:
             else:
                 print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
 
+    #def drop(game, list_of_words, number_of_parameters):
+        #if len(list_of_words) < 2:
+            #print("Que voulez-vous déposer ?")
+        #else:
+           # item_name = list_of_words[1]
+           # player = game.player
+            #current_room = player.current_room
+
+            # Vérifiez si le dépôt est autorisé dans la pièce actuelle
+            #if not current_room.allows_dropping:
+            # print(f"Vous ne pouvez pas déposer d'objets dans cette pièce ({current_room.name}).")
+                #return
+
+            # Chercher l'item dans l'inventaire du joueur
+            #if item_name in player.inventory.items:
+                #item_to_drop = player.inventory.items[item_name]
+
+                # Retirer l'objet de l'inventaire du joueur
+                #del player.inventory.items[item_name]
+
+                # Ajouter l'objet à l'inventaire de la pièce
+               # current_room.inventory.add_item(item_to_drop)
+               # print(f"Vous avez déposé l'objet '{item_name}' dans {current_room.name}.")
+           # else:
+               # print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
+
 
 
     def check(game, list_of_words, number_of_parameters):
