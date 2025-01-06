@@ -551,13 +551,19 @@ class Actions:
                 # Révéler la potion si elle est présente et cachée
                 if "potion" in current_room.inventory.items:
                     current_room.inventory.reveal_item("potion")
-                    print("Le médecin te montre une potion cachée dans cette pièce !")
+                    print("Le médecin te montre une potion cachée dans son sac !")
 
             elif found_npc.name.lower() == "vendeuse":
                 # Révéler le tapis si présent et caché
                 if "tapis" in current_room.inventory.items:
                     current_room.inventory.reveal_item("tapis")
-                    print("La vendeuse te montre un tapis caché dans cette pièce !")
+                    print("La vendeuse te montre un tapis posé dans un coin du carnaval !")
+
+            elif found_npc.name.lower() == "vieux marchand":
+                # Révéler la bague si elle est présente et cachée
+                if "bague" in current_room.inventory.items:
+                    current_room.inventory.reveal_item("bague")
+                    print("Le vieux marchand te montre une bague sur le sol du marché !")
 
 
             return True
@@ -579,68 +585,59 @@ class Actions:
     
 
     def give(game, list_of_words, number_of_parameters):
-        """
-        Permet au joueur de donner un objet à un PNJ.
-        Usage: give <personnage> <objet>
-        """
-        if len(list_of_words) != 3:  # commande + destinataire + objet
+        if len(list_of_words) != 3:
             print("Usage : give <personnage> <objet>")
             return False
-
+            
         target = list_of_words[1].lower()
         item_name = list_of_words[2].lower()
         current_room = game.player.current_room
 
-        # Vérifier si le garde est dans la pièce actuelle
-        #garde_present = False
-        #for npc in current_room.inventory.npcs.values():
-            #if npc.name.lower() == "garde":
-                #garde_present = True
-                #break
-        
-        #if not garde_present:
-            #print("Le garde est au chateau.")
-            #return False
-
-        # Vérifier si l'objet est dans l'inventaire du joueur
         item_found = None
         for name, data in game.player.inventory.items.items():
             if name.lower() == item_name:
                 item_found = data["item"]
                 break
-
+                
         if not item_found:
             print(f"Vous n'avez pas de {item_name} dans votre inventaire.")
             return False
 
-        # Logique pour le garde
         if target == "garde":
-            # Cas de la potion
+            if current_room.name != "Château":
+                print("Il n'y a pas de garde ici.")
+                return False
+                
             if item_name == "potion":
                 game.player.inventory.remove_item("potion")
                 game.victory_checker.garde_convinced = True
-                print("Le garde accepte votre potion et vous laisse entrer dans le château.")
-                return True
-
-            # Cas de la pierre et de la bague
-            elif item_name in ["pierre", "bague"]:
-                # Vérifier si le joueur a les deux objets
-                has_pierre = any(name.lower() == "pierre" for name in game.player.inventory.items)
-                has_bague = any(name.lower() == "bague" for name in game.player.inventory.items)
-                
-                if has_pierre and has_bague:
-                    # Retirer les deux objets
-                    for name in ["pierre", "bague"]:
-                        game.player.inventory.remove_item(name)
-                    game.victory_checker.garde_convinced = True
-                    print("Le garde accepte vos objets et vous laisse entrer dans le château.")
+                chateau_room = next((room for room in game.rooms if room.name == "Château"), None)
+                if chateau_room:
+                    game.player.current_room = "Château"
+                    game.victory_checker.is_in_chateau = True
+                    print("Le garde accepte votre potion et vous laisse entrer dans le château.")
+                    game.update_victory_conditions(False)  # Mise à jour silencieuse
                     return True
-                else:
-                    print("Le garde a besoin des deux objets (pierre et bague) pour être convaincu.")
-                    return False
+            
+            elif item_name in ["pierre", "bague"]:
+                if not hasattr(game.victory_checker, "objects_given"):
+                    game.victory_checker.objects_given = set()
 
-            print("Le garde n'est pas intéressé par cet objet.")
-            return False
-        else:
-            print(f"Vous ne pouvez pas donner d'objet à {target}.")
-            return False
+                game.victory_checker.objects_given.add(item_name)
+                game.player.inventory.remove_item(item_name)
+
+                if game.victory_checker.objects_given == {"pierre", "bague"}:
+                    game.victory_checker.garde_convinced = True
+                    chateau_room = next((room for room in game.rooms if room.name == "Château"), None)
+                    if chateau_room:
+                        game.player.current_room = "Château"
+                        game.victory_checker.is_in_chateau = True
+                        print("Le garde accepte la pierre scintillante et la baague et vous laisse entrer dans le château.")
+                        game.update_victory_conditions(False)  # Mise à jour silencieuse
+                        return True
+                    else:
+                        print("Erreur : La salle 'Château' n'existe pas.")
+                else:
+                    print(f"Le garde accepte votre {item_name}, mais il attend un autre objet.")
+                    return True
+                    

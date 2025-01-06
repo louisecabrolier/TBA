@@ -13,10 +13,10 @@ from actions import Actions
 from item import Item
 from character import Character
 from beamer import Beamer
+from door import Door
 from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
-from door import Door
 from interfacegraphique import GameGUI 
 
 
@@ -76,7 +76,7 @@ class Game:
         # Setup rooms
         foret = Room("Forêt", "dans une forêt illuminée", "dessin/foret.png")
         self.rooms.append(foret)
-        entreecite = Room("Entrée de la cité", "à l'entrée de la cité, les portes de la cité sont maintenant scellées")
+        entreecite = Room("Entrée de la cité", "à l'entrée de la cité")
         self.rooms.append(entreecite)
         carnaval = Room("carnaval", "au carnaval")
         self.rooms.append(carnaval)
@@ -166,7 +166,7 @@ class Game:
         foret.inventory["champignon"] = mushroom
         foret.inventory["clef"] = key
         carnaval.inventory.items["tapis"] = {"item": tapis, "hidden": True} #truc que la vendeuse lui donne au carnaval
-        marche.inventory["bague"] = bague #marchand
+        marche.inventory["bague"] = {"item": bague, "hidden": True} #marchand cachée au début
 
 
         #PNJ
@@ -177,7 +177,7 @@ class Game:
         medecin = Character("Médecin", "Un médecin", carnaval, ["Tiens toi! Prends la potion que j'ai mise sur la table !", "Je dois aller guérir les nouveaux malades ! Dépêche toi !", "Satanée infection!!"], visible = False)
         vendeuse = Character("Vendeuse", "Une vendeuse", carnaval, ["Prends ce tapis", "Tu peux me faire confiance, il est superbe et de grande valeur!"], visible = False)
         annonceur = Character("Annonceur", "Un annonceur qui arrive sur la place du Carnaval", carnaval, ["Que tout le monde aille vite se réfugier au château ! Un terrible virus va nous tuer!"], visible = True)
-        villageois = Character("Villageois", "Un villageois à l'apparence suspecte et décrépite", entreecite, ["Hgrhh...Je me sens mal..."], visible = False)
+        villageois = Character("Villageois", "Un villageois à l'apparence suspecte et décrépite", entreecite, ["Hgrhh...Je me sens mal..."], visible = True)
         garde = Character("Garde", "Le garde du chateau", chateau, ["Il y a trop de monde, je ne peux vous laisser passer, à moins que vous ayez quelque chose pour me convaincre?"], visible = True)
         marchand = Character("Vieux marchand", "Un marchand", marche, ["Un objet qui te seras utile est pour toi, il se trouve dans cette pièce"], visible = True)
 
@@ -226,15 +226,15 @@ class Game:
             # Déplacer uniquement le PNJ mobile si c'était une commande "go"
             if should_move_npcs:
                 if DEBUG:
-                    print("DEBUG: Début du déplacement du PNJ")
+                    print("DEBUG: Début du déplacement du villageois")
                 # Chercher uniquement le PNJ mobile dans toutes les pièces
                 for room in self.rooms:
-                    if "pnj" in room.inventory.npcs:
-                        pnj = room.inventory.npcs["pnj"]
-                        pnj.move()
+                    if "villageois" in room.inventory.npcs:
+                        villageois = room.inventory.npcs["villageois"]
+                        villageois.move()
                         break  # On sort dès qu'on a trouvé et déplacé le PNJ
                 if DEBUG:
-                    print("DEBUG: Fin du déplacement du PNJ")
+                    print("DEBUG: Fin du déplacement du villageois")
 
     def check_game_state(self):
         """Vérifie l'état du jeu et retourne un message si le jeu est terminé"""
@@ -260,48 +260,56 @@ class Game:
     def update_victory_conditions(self, show_validation=True):
         """Met à jour les conditions de victoire basées sur l'état actuel du jeu"""
         # Vérifie si le joueur est dans le château
-        is_in_chateau = self.player.current_room.name.lower() == "chateau"
-        self.victory_checker.update_condition("chateau", is_in_chateau)
-        if show_validation:
-            if is_in_chateau:
-                print("Condition validée: Vous êtes dans le château.")
-            else:
-                print("Condition non validée: Vous n'êtes pas encore dans le château.")
+        if self.player.current_room == self.chateau:
+            in_the_right_room = self.chateau
+            self.victory_checker.update_condition("Château", in_the_right_room)
+            #print("Condition validée: Vous êtes dans le château.")
+
+            #in_the_right_room = getattr(self.player, 'in_the_right_room', False)
+            #self.victory_checker.update_condition("Château", in_the_right_room)
+        #is_in_chateau = self.player.current_room() == "Château"
+        #self.player.current_room = next((room for room in game.rooms if room.name == self.player.current_room),None)
+        #self.victory_checker.update_condition("Château", is_in_chateau)
+        #if show_validation:
+            #if in_the_right_room:
+                #print("Condition validée: Vous êtes dans le château.")
+           # else:
+                #print("Condition non validée: Vous n'êtes pas encore dans le château.")
         
         # Vérifie les objets dans l'inventaire
         inventory_items = [item.lower() for item in self.player.inventory.items]
         
         has_potion = "potion" in inventory_items
         self.victory_checker.update_condition("potion", has_potion)
-        if show_validation:
-            if has_potion:
-                print("Condition validée: Vous avez la potion.")
-            else:
-                print("Condition non validée: Vous n'avez pas la potion.")
+        #if show_validation:
+            #if has_potion:
+                #print("Condition validée: Vous avez la potion.")
+            #else:
+                #print("Condition non validée: Vous n'avez pas la potion.")
         
         has_pierre = "pierre" in inventory_items
         self.victory_checker.update_condition("pierre", has_pierre)
-        if show_validation:
-            if has_pierre:
-                print("Condition validée: Vous avez la pierre.")
-            else:
-                print("Condition non validée: Vous n'avez pas la pierre.")
+        #if show_validation:
+            #if has_pierre:
+                #print("Condition validée: Vous avez la pierre.")
+            #else:
+                #print("Condition non validée: Vous n'avez pas la pierre.")
         
         has_bague = "bague" in inventory_items
         self.victory_checker.update_condition("bague", has_bague)
-        if show_validation:
-            if has_bague:
-                print("Condition validée: Vous avez la bague.")
-            else:
-                print("Condition non validée: Vous n'avez pas la bague.")
+        #if show_validation:
+            #if has_bague:
+                #print("Condition validée: Vous avez la bague.")
+            #else:
+                #print("Condition non validée: Vous n'avez pas la bague.")
         
         # Vérifie les dialogues
         has_talked_to_annonceur = getattr(self.player, 'has_talked_to_annonceur', False)
         self.victory_checker.update_condition("annonceur", has_talked_to_annonceur)
-        if show_validation and has_talked_to_annonceur:
-            print("Condition validée: Vous avez parlé à l'annonceur.")
-        elif show_validation:
-            print("Condition non validée: Vous n'avez pas parlé à l'annonceur.")
+        #if show_validation and has_talked_to_annonceur:
+            #print("Condition validée: Vous avez parlé à l'annonceur.")
+        #elif show_validation:
+            #print("Condition non validée: Vous n'avez pas parlé à l'annonceur.")
 
 
     def process_command(self, command_string) -> None:
@@ -326,6 +334,8 @@ class Game:
                 
                 # Mettre à jour la condition dans le victory checker
                 self.victory_checker.update_condition("annonceur", True)
+                #Mettre à jour les sorties limitées = plus obligé d'aller à l'ouest après entreecite
+                self.limited_exits = False
 
                 # Rendre les PNJ visibles dans la salle du carnaval
                 for character in self.characters:  # Utilise la liste des personnages de la classe Game
@@ -342,7 +352,7 @@ class Game:
                     print("\nPersonnages :")
                     for npc in visible_npcs:
                         print(f"- {npc.name} : {npc.description}")
-                
+            
                 return
             else:
                 print("\nL'annonceur n'est pas ici.\n")
@@ -351,7 +361,7 @@ class Game:
         # Ajoutez cette partie pour gérer l'interaction avec le garde
         if command_word == "give" and len(list_of_words) > 2:
             item_name = list_of_words[2].lower()
-            if self.player.current_room.name.lower() == "chateau":
+            if self.player.current_room.name.lower() == "Château":
                 if any(npc.name.lower() == "garde" for npc in self.player.current_room.inventory.npcs.values()):
                     if item_name in ["potion", "pierre", "bague"]:
                         if item_name in self.player.inventory.items:
@@ -373,8 +383,7 @@ class Game:
                 else:
                     print("\nIl n'y a pas de garde ici.")
             else:
-                print("\nIl n'y a personne à qui donner quelque chose ici.")
-                
+                print("")
             if DEBUG:
                 print(f"DEBUG: Liste des mots de la commande: {list_of_words}")
 
@@ -406,8 +415,8 @@ class Game:
                         print("\nVous ne pouvez pas entrer dans la cité sans la clé.\n")
                         return
                     else:
-                        print("\nVous utilisez la clé pour ouvrir les portes de la cité.")
-                        self.door_opened = True  # La porte est maintenant ouverte
+                        print("\nVous ouvrez les portes de la cité avec la clé et celles-ci se referment derrière vous.")
+                        self.is_open = True  # La porte est maintenant ouverte
 
             
             directions_valides = set()
