@@ -1,4 +1,9 @@
-"""Description: Game class"""
+"""Description: Game class"""  # pylint: disable = too-many-instance-attributes
+# pylint: disable = too-many-locals
+# pylint: disable = too-many-statements
+# pylint: disable = too-many-branches
+# pylint: disable = too-many-nested-blocks
+
 # Import modules
 from room import Room
 from player import Player
@@ -10,7 +15,7 @@ from beamer import Beamer
 from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
-from interfacegraphique import GameGUI 
+from interfacegraphique import GameGUI
 
 
 class Game:
@@ -52,10 +57,10 @@ class Game:
         """Configure le jeu en initialisant les commandes, les salles, les objets et les PNJ"""
 
         # Setup commands
-        help = Command("help", " : afficher cette aide", Actions.help,0)
-        self.commands["help"] = help
-        quit = Command("quit", " : quitter le jeu", Actions.quit,0)
-        self.commands["quit"] = quit
+        aide = Command("aide", " : afficher cette aide", Actions.aide,0)
+        self.commands["aide"] = aide
+        quitter = Command("quitter", " : quitter le jeu", Actions.quitter,0)
+        self.commands["quitter"] = quitter
         go = Command("go","<direction>: se déplacer dans une direction (N, E, S, O)", Actions.go,1)
         self.commands["go"] = go
         history = Command("history",":afficher l'historique des pièces visitées", Actions.history,0)
@@ -275,7 +280,7 @@ class Game:
             return "\nVICTOIRE: Félicitations, vous avez accompli votre quête!"
         return None
 
-    def update_victory_conditions(self, show_validation=True):
+    def update_victory_conditions(self):
         """Met à jour les conditions de victoire basées sur l'état actuel du jeu"""
         # Vérifie si le joueur est dans le château
         if self.player.current_room == self.chateau:
@@ -297,7 +302,7 @@ class Game:
         """Traite la commande entrée par le joueur"""
         command_string = command_string.strip()
         if command_string == "":
-            return
+            return False
         list_of_words = command_string.split(" ")
         command_word = list_of_words[0]
         # Gérer la commande "talk annonceur" avant le reste
@@ -336,10 +341,9 @@ class Game:
                     print("\nPersonnages :")
                     for npc in visible_npcs:
                         print(f"- {npc.name} : {npc.description}")
-                return
-            else:
-                print("\nL'annonceur n'est pas ici.\n")
-                return
+                return False
+            print("\nL'annonceur n'est pas ici.\n")
+            return False
 # Ajoutez cette partie pour gérer l'interaction avec le garde
         if command_word == "give" and len(list_of_words) > 2:
             item_name = list_of_words[2].lower()
@@ -351,7 +355,7 @@ class Game:
                             if item_name == "potion":
                                 print("\nVous donnez la potion au garde."
                                         "Il l'examine et vous laisse passer.")
-                                self.player.inventory.items.remove("potion")
+                                #self.player.inventory.items.remove("potion")
                                 self.victory_checker.garde_convinced = True
                             elif item_name in ["pierre", "bague"]:
                                 if all(item in self.player.inventory.items
@@ -359,34 +363,25 @@ class Game:
                                     print("\nVous montrez la pierre et la bague au garde.")
                                     print("\nImpressionné et conquis, il vous laisse passer.")
                                     self.victory_checker.garde_convinced = True
-                                else:
-                                    print("\nLe garde demande des objets pour être convaincu.")
-                            return
-                        else:
-                            print(f"\nVous n'avez pas {item_name} dans votre inventaire.")
-                    else:
-                        print("\nLe garde n'est pas intéressé par cet objet.")
-                else:
-                    print("\nIl n'y a pas de garde ici.")
-            else:
-                print("")
+                                print("\nLe garde demande des objets pour être convaincu.")
+                        print(f"\nVous n'avez pas {item_name} dans votre inventaire.")
+                    print("\nLe garde n'est pas intéressé par cet objet.")
+                print("\nIl n'y a pas de garde ici.")
+            print("")
             if DEBUG:
                 print(f"DEBUG: Liste des mots de la commande: {list_of_words}")
         if command_word == "go":
             if len(list_of_words) < 2:
                 print("\nVeuillez spécifier une direction.\n")
-                return
             directions_values = {"N", "S", "E", "O", "U", "D"}
             direction = list_of_words[1][0].upper()
             if direction not in directions_values:
                 print("\nDirection invalide.\n")
-                return
             list_of_words[1] = direction
             if self.limited_exits:
                 # Restriction des sorties
                 if self.player.current_room == self.entreecite and direction not in {"O"}:
                     print("Vous ne pouvez aller qu'à l'ouest pour l'instant.")
-                    return
             # Vérifier si on est dans la forêt et qu'on va vers la cité
             if self.player.current_room == self.foret and direction == "N":
                 # Si la porte n'a pas encore été ouverte
@@ -396,18 +391,15 @@ class Game:
                     # items est un dictionnaire, pas une méthode
                     if not has_key:
                         print("\nVous ne pouvez pas entrer dans la cité sans la clé.\n")
-                        return
-                    else:
-                        print("\nVous ouvrez les portes de la cité avec la clé "
-                        "et celles-ci se referment derrière vous.")
-                        self.is_open = True  # La porte est maintenant ouverte
+                    print("\nVous ouvrez les portes de la cité avec la clé "
+                    "et celles-ci se referment derrière vous.")
+                    self.is_open = True  # La porte est maintenant ouverte
             directions_valides = set()
             for direction_possible, next_room in self.player.current_room.exits.items():
                 if next_room is not None:
                     directions_valides.add(direction_possible)
             if direction not in directions_valides:
                 print("\nVous ne pouvez pas aller dans cette direction.\n")
-                return
            # Vérifier si le déplacement mène à "endroitinconnu" (condition de défaite)
             next_room = self.player.current_room.exits.get(direction)
             if next_room and next_room.name == "Endroit inconnu":  # Vérifie le nom de la salle
@@ -420,18 +412,18 @@ class Game:
                 print("Parlez aux différentes personnes"
                 "que vous verrez pour en savoir plus sur le jeu.")
                 self.carnaval_first_visit = False  # Mettre à jour le drapeau
-        if command_word not in self.commands.keys():
+        if command_word not in self.commands:
             print(f"\nCommande '{command_word}' non reconnue."
              "Entrez 'help' pour voir la liste des commandes disponibles.\n")
-        else:
-            command = self.commands[command_word]
-            command.action(self, list_of_words, command.number_of_parameters)
+        command = self.commands[command_word]
+        command.action(self, list_of_words, command.number_of_parameters)
         return False  #Si la commande n'est pas reconnue ou traitée
+
     # Print the welcome message
     def print_welcome(self):
         """Affiche le message de bienvenue au début du jeu"""
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
-        print("Entrez 'help' pour connaître les commandes du jeu.")
+        print("Entrez 'aide' pour connaître les commandes du jeu.")
         print(self.player.current_room.get_long_description())
 
     @staticmethod
@@ -441,14 +433,13 @@ class Game:
         mode = input("Choisissez un mode : 'console' ou 'gui' : ").strip().lower()
         if mode == "gui":
             print("Lancement de l'interface graphique...")
-            from interfacegraphique import GameGUI
+            #from interfacegraphique import GameGUI
             game = Game()  # Create a new game instance
             app = GameGUI(game)  # Pass the game instance to GameGUI
             app.run()
-        else:
-            print("Lancement en mode console...")
-            game = Game()
-            game.play()
+        print("Lancement en mode console...")
+        game = Game()
+        game.play()
 
 
 if __name__ == "__main__":

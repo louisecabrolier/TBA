@@ -101,7 +101,7 @@ class Actions:
 
 
 
-    def quit(self, game, list_of_words, number_of_parameters):
+    def quitter(self, game, list_of_words, number_of_parameters):
         """
         Quit the game.
 
@@ -130,11 +130,11 @@ class Actions:
         >>> from game import Game
         >>> game = Game()
         >>> game.setup()
-        >>> quit(game, ["quit"], 0)
+        >>> quitter(game, ["quitter"], 0)
         True
-        >>> quit(game, ["quit", "N"], 0)
+        >>> quitter(game, ["quitter", "N"], 0)
         False
-        >>> quit(game, ["quit", "N", "E"], 0)
+        >>> quitter(game, ["quitter", "N", "E"], 0)
         False
 
 
@@ -158,7 +158,7 @@ class Actions:
 
 
 
-    def help(self, game, list_of_words, number_of_parameters):
+    def aide(self, game, list_of_words, number_of_parameters):
         """
         Print the list of available commands.
 
@@ -184,11 +184,11 @@ class Actions:
         >>> from game import Game
         >>> game = Game()
         >>> game.setup()
-        >>> help(game, ["help"], 0)
+        >>> aide(game, ["aide"], 0)
         True
-        >>> help(game, ["help", "N"], 0)
+        >>> aide(game, ["aide", "N"], 0)
         False
-        >>> help(game, ["help", "N", "E"], 0)
+        >>> aide(game, ["aide", "N", "E"], 0)
         False
 
 
