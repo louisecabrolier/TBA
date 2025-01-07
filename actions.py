@@ -1,6 +1,10 @@
+"""Actions""" # pylint: disable = too-many-branches
 
-
-
+#import inventory
+#import room
+#from beamer import Beamer
+#from player import Player
+#from item import Item
 
 # The actions module contains the functions that are called when a command is executed.
 # Each function takes 3 parameters:
@@ -18,28 +22,27 @@
 
 
 
-# The error message is stored in the MSG0 and MSG1 variables and formatted with the command_word variable, the first word in the command.
+# The error message is stored in the MSG0 and MSG1 variables
+# and formatted with the command_word variable
+# the first word in the command.
 # The MSG0 variable is used when the command does not take any parameter.
 MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 # The MSG1 variable is used when the command takes 1 parameter.
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 
 
-import inventory
-import room
-from beamer import Beamer
-from player import Player
-from item import Item
+
 
 
 
 
 class Actions:
+    """définir les actions possibles dans le jeu"""
 
 
 
 
-    def go(game, list_of_words, number_of_parameters):
+    def go(self, game, list_of_words, number_of_parameters):
         """
         Move the player in the direction specified by the parameter.
         The parameter must be a cardinal direction (N, E, S, O).
@@ -62,7 +65,7 @@ class Actions:
 
 
         Examples:
-       
+
         >>> from game import Game
         >>> game = Game()
         >>> game.setup()
@@ -77,7 +80,7 @@ class Actions:
 
 
         """
-       
+
         player = game.player
         l = len(list_of_words)
         # If the number of parameters is incorrect, print an error message and return False.
@@ -98,7 +101,7 @@ class Actions:
 
 
 
-    def quit(game, list_of_words, number_of_parameters):
+    def quit(self, game, list_of_words, number_of_parameters):
         """
         Quit the game.
 
@@ -144,7 +147,7 @@ class Actions:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
-       
+
         # Set the finished attribute of the game object to True.
         player = game.player
         msg = f"\nMerci {player.name} d'avoir joué. Au revoir.\n"
@@ -155,10 +158,10 @@ class Actions:
 
 
 
-    def help(game, list_of_words, number_of_parameters):
+    def help(self, game, list_of_words, number_of_parameters):
         """
         Print the list of available commands.
-       
+
         Args:
             game (Game): The game object.
             list_of_words (list): The list of words in the command.
@@ -202,7 +205,7 @@ class Actions:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
-       
+
         # Print the list of available commands.
         print("\nVoici les commandes disponibles:")
         for command in game.commands.values():
@@ -213,7 +216,7 @@ class Actions:
 
 
 
-    def history(game, list_of_words, number_of_parameters):
+    def history(self, game, list_of_words, number_of_parameters):
         """
         Affiche l'historique des pièces visitées par le joueur.
 
@@ -255,7 +258,7 @@ class Actions:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
-           
+
         # Afficher l'historique des pièces visitées.
         history = game.player.get_history()
         print(history)
@@ -268,55 +271,56 @@ class Actions:
 
 
 
-    def back(game, list_of_words, number_of_parameters):
-            """
-            Move the player back to the previous position.
+    def back(self, game, list_of_words, number_of_parameters):
+        """
+        Move the player back to the previous position.
            
-            Args:
-                game (Game): The game object.
-                list_of_words (list): The list of words in the command.
-                number_of_parameters (int): The number of parameters expected by the command.
+        Args:
+            game (Game): The game object.
+            list_of_words (list): The list of words in the command.
+            number_of_parameters (int): The number of parameters expected by the command.
 
 
 
 
-            Returns:
-                bool: True if the command was executed successfully, False otherwise.
-            """
+        Returns:
+            bool: True if the command was executed successfully, False otherwise.
+        """
 
 
 
 
-            player = game.player
-            l = len(list_of_words)
-           
-            # If the number of parameters is incorrect, print an error message and return False.
-            if l != number_of_parameters + 1:
-                command_word = list_of_words[0]
-                print(MSG0.format(command_word=command_word))
-                return False
+        player = game.player
+        l = len(list_of_words)
 
-            # Check if there is a previous position to return to.
-            if not player.history:
-                print("Vous ne pouvez pas revenir en arrière, aucun déplacement précédent enregistré.")
-                return False
+        # If the number of parameters is incorrect, print an error message and return False.
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
 
-            # Pop the last position from the history and move the player back.
-            previous_position = player.history.pop()
+        # Check if there is a previous position to return to.
+        if not player.history:
+            print("Vous ne pouvez pas revenir en arrière,"
+            "aucun déplacement précédent enregistré.")
+            return False
 
-            player.position = previous_position
-            #mettre a jour l'inventaire dune piece avec le back
-            player.current_room = previous_position
-            
-            print(f"Vous êtes revenu à votre position précédente : {player.position.name}")
+        # Pop the last position from the history and move the player back.
+        previous_position = player.history.pop()
 
-            return True
+        player.position = previous_position
+        #mettre a jour l'inventaire dune piece avec le back
+        player.current_room = previous_position
+
+        print(f"Vous êtes revenu à votre position précédente : {player.position.name}")
+
+        return True
 
 
 
 
 #inventaire
-    def inventory(game, list_of_words, number_of_parameters):
+    def inventory(self, game, list_of_words, number_of_parameters):
         """
         Display the player's inventory.
 
@@ -330,26 +334,23 @@ class Actions:
         Returns:
             bool: True if the command was executed successfully, False otherwise.
         """
-       
+
         l = len(list_of_words)
-       
+
         # Vérification du nombre de paramètres
         if l != number_of_parameters + 1:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
-        
+
         # Utilisation du player directement depuis l'objet game
         print("\nVotre inventaire :")
         print(game.player.get_inventory())
-        
-        # Affichage de l'inventaire
-        #print(player.get_inventory())
-        #print(current_room.get_inventory())
-        #return True
-   
+        return True
+
+
     # Dans votre fonction look
-    def look(game, list_of_words, number_of_parameters):
+    def look(self, game):
         """
         Permet au joueur de regarder autour de lui ou un objet spécifique.
         Ne montre que les PNJ visibles (annonceur au début, puis tous après lui avoir parlé).
@@ -378,7 +379,7 @@ class Actions:
 
 
 
-    def take(game, list_of_words, number_of_parameters):
+    def take(self, game, list_of_words, number_of_parameters):
         """
         Permet au joueur de prendre un objet.
         """
@@ -403,116 +404,82 @@ class Actions:
 
         if item_found:
             # Vérifier le poids de l'objet
-            if game.player.get_current_weight() + item_found.poids > game.player.max_poids: 
+            if game.player.get_current_weight() + item_found.poids > game.player.max_poids:
                 print("Vous avez trop de poids, vous ne pouvez pas prendre cet objet.")
                 return False
-            
+
             # Ajouter l'objet à l'inventaire du joueur
             game.player.inventory.add_item(item_found)
             current_room.inventory.remove_item(item_name)
             print(f"Vous avez pris {item_found.name}.")
             return True
-        else:
-            print(f"L'objet '{item_name}' n'est pas dans cette pièce.")
-            return False
+        print(f"L'objet '{item_name}' n'est pas dans cette pièce.")
+        return False
 
 
 
 
-    def drop(game, list_of_words, number_of_parameters):
+    def drop(self, game, list_of_words):
+        """déposer un objet"""
         if len(list_of_words) < 2:
             print("Que voulez-vous déposer ?")
-        else:
-            item_name = list_of_words[1].lower()  # Normaliser le nom de l'item
-            player = game.player
-            current_room = player.current_room
-        
-            # Pièces autorisées pour drop
-            allowed_rooms = ["Forêt", "Rez-de-chaussé de la maison", "Château"]
-            current_room_name =  current_room.name.strip()
-            if current_room_name not in allowed_rooms:
-                print("Vous ne pouvez pas déposer d'objets ici.")
-                return
-        
+        item_name = list_of_words[1].lower()  # Normaliser le nom de l'item
+        player = game.player
+        current_room = player.current_room
 
-            # Chercher l'item dans l'inventaire du joueur, en prenant en compte la casse
-            item_found = None
-            for name, data in player.inventory.items.items():
-                if name.lower() == item_name:  # Comparaison insensible à la casse
-                    item_found = data["item"]
-                    break
-            
-            if item_found:
-                # Retirer l'item de l'inventaire du joueur
-                del player.inventory.items[name]  # Utilise le nom trouvé
-                # Ajouter l'item à l'inventaire de la pièce
-                player.current_room.inventory.add_item(item_found)
-                print(f"Vous avez déposé l'objet '{name}'")
-            else:
-                print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
-
-    #def drop(game, list_of_words, number_of_parameters):
-        #if len(list_of_words) < 2:
-            #print("Que voulez-vous déposer ?")
-        #else:
-           # item_name = list_of_words[1]
-           # player = game.player
-            #current_room = player.current_room
-
-            # Vérifiez si le dépôt est autorisé dans la pièce actuelle
-            #if not current_room.allows_dropping:
-            # print(f"Vous ne pouvez pas déposer d'objets dans cette pièce ({current_room.name}).")
-                #return
-
-            # Chercher l'item dans l'inventaire du joueur
-            #if item_name in player.inventory.items:
-                #item_to_drop = player.inventory.items[item_name]
-
-                # Retirer l'objet de l'inventaire du joueur
-                #del player.inventory.items[item_name]
-
-                # Ajouter l'objet à l'inventaire de la pièce
-               # current_room.inventory.add_item(item_to_drop)
-               # print(f"Vous avez déposé l'objet '{item_name}' dans {current_room.name}.")
-           # else:
-               # print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
+        # Pièces autorisées pour drop
+        allowed_rooms = ["Forêt", "Rez-de-chaussé de la maison", "Château"]
+        current_room_name =  current_room.name.strip()
+        if current_room_name not in allowed_rooms:
+            print("Vous ne pouvez pas déposer d'objets ici.")
+            return
 
 
+        # Chercher l'item dans l'inventaire du joueur, en prenant en compte la casse
+        item_found = None
+        name = None
+        for name, data in player.inventory.items.items():
+            if name.lower() == item_name:  # Comparaison insensible à la casse
+                item_found = data["item"]
+                break
 
-    def check(game, list_of_words, number_of_parameters):
+        if item_found:
+            # Retirer l'item de l'inventaire du joueur
+            del player.inventory.items[name]  # Utilise le nom trouvé
+            # Ajouter l'item à l'inventaire de la pièce
+            player.current_room.inventory.add_item(item_found)
+            print(f"Vous avez déposé l'objet '{name}'")
+        print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
+
+    def check(self, game):
         """ Affiche le contenu de l'inventaire du joueur """
         if not game.player.inventory.items:
             print("Votre inventaire est vide")
-        else:
-            print("Votre inventaire contient :")
-            for item_name, data in game.player.inventory.items.items():
-                # Accède à l'instance de l'objet dans le dictionnaire
-                item = data["item"]
-                print(f"- {item_name}: {item.description} ({item.poids} kg)")
+        print("Votre inventaire contient :")
+        for item_name, data in game.player.inventory.items.items():
+            # Accède à l'instance de l'objet dans le dictionnaire
+            item = data["item"]
+            print(f"- {item_name}: {item.description} ({item.poids} kg)")
 
-    
 
-    def charge(game):
+
+    def charge(self, game):
+        """charger le beamer"""
         player = game.player
         #beamer = player.inventory.get("beamer")
         beamer = player.inventory["beamer"]
         if not beamer:
             print("Vous ne posséder pas de beamer pour le charger.")
-            return
-        
         beamer.charge(player.current_room)
-    
-    def teleporte(game):
-            player = game.player
-            beamer = player.inventory["beamer"]
 
-            if not beamer:
-                print("Vous ne possédez pas de beamer pour l'utiliser.")
-                return
+    def teleporte(self, game):
+        """se téléporter"""
+        player = game.player
+        beamer = player.inventory["beamer"]
+        if not beamer:
+            print("Vous ne possédez pas de beamer pour l'utiliser.")
 
-            beamer.teleporte(player)
-
-    def talk(game, list_of_words, number_of_parameters):
+    def talk(self, game, list_of_words):
         """
         Permet au joueur d'interagir avec un PNJ.
         Les PNJ supplémentaires apparaissent après avoir parlé à l'annonceur.
@@ -531,7 +498,7 @@ class Actions:
             # Vérifier si le PNJ est visible (s'il a cet attribut)
             if hasattr(npc, 'visible') and not npc.visible:
                 continue
-                    
+
             if npc.name.lower() == npc_name.lower():
                 found_npc = npc
                 break
@@ -544,16 +511,18 @@ class Actions:
             # Si c'est l'annonceur et que c'est la première conversation
             if found_npc.name.lower() == "annonceur" and not hasattr(game, 'talked_to_announcer'):
                 game.talked_to_announcer = True
-                    
+
                 # Faire apparaître les autres PNJ
                 for room in game.rooms:
                     for npc in room.inventory.npcs.values():
                         if hasattr(npc, 'visible'):
                             npc.visible = True
-                    
+
                 # Message spécial après avoir parlé à l'annonceur
-                print("\n* Les autres visiteurs du carnaval commencent à apparaître autour de toi... *")
-                print("\nN'hésite pas à intéragir avec les habitants, ce qu'ils ont à t'offrir sera peut être utile dans ta quête vers le château.\n")
+                print("\n* Les autres visiteurs du carnaval "
+                "commencent à apparaître autour de toi... *")
+                print("\nN'hésite pas à intéragir avec les habitants,"
+                "ce qu'ils ont à t'offrir sera peut être utile dans ta quête vers le château.\n")
 
             elif found_npc.name.lower() == "médecin":
                 # Révéler la potion si elle est présente et cachée
@@ -576,27 +545,28 @@ class Actions:
 
             return True
 
-        else:
-            # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
-            for room in game.rooms:
-                for npc in room.inventory.npcs.values():
-                    # Ne pas mentionner les PNJ invisibles
-                    if hasattr(npc, 'visible') and not npc.visible:
-                        continue
-                            
-                    if npc.name.lower() == npc_name.lower():
-                        print(f"\n{npc.name} n'est pas ici. Il/Elle se trouve dans : {room.name}\n")
-                        return False
 
-            print(f"\nIl n'y a personne qui s'appelle '{npc_name}' dans les environs.\n")
-            return False
-    
+        # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
+        for room in game.rooms:
+            for npc in room.inventory.npcs.values():
+                # Ne pas mentionner les PNJ invisibles
+                if hasattr(npc, 'visible') and not npc.visible:
+                    continue
 
-    def give(game, list_of_words, number_of_parameters):
+                if npc.name.lower() == npc_name.lower():
+                    print(f"\n{npc.name} n'est pas ici. Il/Elle se trouve dans : {room.name}\n")
+                    return False
+
+        print(f"\nIl n'y a personne qui s'appelle '{npc_name}' dans les environs.\n")
+        return False
+
+
+    def give(self, game, list_of_words):
+        """donner un objet à un pnj"""
         if len(list_of_words) != 3:
             print("Usage : give <personnage> <objet>")
             return False
-            
+
         target = list_of_words[1].lower()
         item_name = list_of_words[2].lower()
         current_room = game.player.current_room
@@ -606,7 +576,7 @@ class Actions:
             if name.lower() == item_name:
                 item_found = data["item"]
                 break
-                
+
         if not item_found:
             print(f"Vous n'avez pas de {item_name} dans votre inventaire.")
             return False
@@ -615,7 +585,7 @@ class Actions:
             if current_room.name != "Château":
                 print("Il n'y a pas de garde ici.")
                 return False
-                
+
             if item_name == "potion":
                 game.player.inventory.remove_item("potion")
                 game.victory_checker.garde_convinced = True
@@ -626,7 +596,7 @@ class Actions:
                     print("Le garde accepte votre potion et vous laisse entrer dans le château.")
                     game.update_victory_conditions(False)  # Mise à jour silencieuse
                     return True
-            
+
             elif item_name in ["pierre", "bague"]:
                 if not hasattr(game.victory_checker, "objects_given"):
                     game.victory_checker.objects_given = set()
@@ -636,16 +606,17 @@ class Actions:
 
                 if game.victory_checker.objects_given == {"pierre", "bague"}:
                     game.victory_checker.garde_convinced = True
-                    chateau_room = next((room for room in game.rooms if room.name == "Château"), None)
+                    chateau_room = next((room for room in game.rooms
+                    if room.name == "Château"), None)
                     if chateau_room:
                         game.player.current_room = "Château"
                         game.victory_checker.is_in_chateau = True
-                        print("Le garde accepte la pierre scintillante et la baague et vous laisse entrer dans le château.")
+                        print("Le garde accepte la pierre scintillante"
+                        "et la bague et vous laisse entrer dans le château.")
                         game.update_victory_conditions(False)  # Mise à jour silencieuse
                         return True
-                    else:
-                        print("Erreur : La salle 'Château' n'existe pas.")
-                else:
-                    print(f"Le garde accepte votre {item_name}, mais il attend un autre objet.")
-                    return True
-                    
+                    print("Erreur : La salle 'Château' n'existe pas.")
+                print(f"Le garde accepte votre {item_name}, mais"
+                "il attend un autre objet.")
+
+        return True

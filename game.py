@@ -271,7 +271,7 @@ class Game:
         # Mise à jour des conditions de victoire basées sur l'état actuel
         self.update_victory_conditions()
         # Vérification des conditions de victoire
-        if all(condition() for condition in self.victory_checker.CONDITIONS_VICT):
+        if all(condition() for condition in self.victory_checker.conditionvict):
             return "\nVICTOIRE: Félicitations, vous avez accompli votre quête!"
         return None
 

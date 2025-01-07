@@ -1,4 +1,4 @@
-"""items"""
+"""items""" # pylint: disable=too-few-public-methods
 class Item:
     """classe item"""
     def __init__(self, name, description, poids, hidden=False):

@@ -1,1 +1,2 @@
+"""test debug"""
 DEBUG = False

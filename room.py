@@ -27,9 +27,8 @@ class Room:
         Returns:
             Room: Salle dans la direction donnée ou None si pas de sortie
         """
-        if direction in self.exits.keys():
-            return self.exits[direction]
-        return None
+        return self.exits.get(direction)
+
 
     def get_exit_string(self):
         """Retourne une chaîne décrivant les sorties disponibles

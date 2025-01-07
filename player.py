@@ -1,5 +1,4 @@
-"""classe joueur"""
-from room import Room
+"""classe joueur""" # pylint: disable=too-many-instance-attributes
 from inventory import Inventory
 
 class Player():
@@ -44,13 +43,12 @@ class Player():
         print(self.current_room.get_long_description())
         return True
 
-    def get_history(self) :
+    def get_history(self):
         """avoir lhistorique"""
         nomsendroits = [room.name for room in self.history]
         if nomsendroits:
             return "\n".join(nomsendroits)
-        else:
-            return "Aucune pièce visitée"
+        return "Aucune pièce visitée"
 
     def get_inventory(self):
         """
@@ -60,7 +58,7 @@ class Player():
         """
         return self.inventory
 
-    def get_current_weight(self): 
+    def get_current_weight(self):
         """pr pas que l'inventaire nait une val maximum a 10kg"""
         return sum(data["item"].poids for data in self.inventory.items.values())
 

@@ -1,5 +1,5 @@
-"""pieces"""
-from room import Room
+"""pieces""" # pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments
 import random
 from config import DEBUG
 
@@ -50,8 +50,7 @@ class Character:
             self._current_msgs = self.msgs.copy()
         if self._current_msgs:
             return self._current_msgs.pop(0)
-        else:
-            return "..."
+        return "..."
     #déplacer les PNJ
 
     def move(self):
