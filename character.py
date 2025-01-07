@@ -1,3 +1,4 @@
+"""pieces"""
 from room import Room
 import random
 from config import DEBUG
@@ -33,13 +34,13 @@ class Character:
         return f"{self.name} : {self.description}"
 
     def add_message(self, msg: str) -> None:
-            """
-            Ajoute un message à la liste des messages du personnage.
+        """
+        Ajoute un message à la liste des messages du personnage.
             
-            Args:
-                msg: Message à ajouter
-            """
-            self.msgs.append(msg)
+        Args:
+            msg: Message à ajouter
+        """
+        self.msgs.append(msg)
 
     def get_msg(self):
         """
@@ -47,7 +48,6 @@ class Character:
         """
         if not self._current_msgs:
             self._current_msgs = self.msgs.copy()
-        
         if self._current_msgs:
             return self._current_msgs.pop(0)
         else:
@@ -62,33 +62,26 @@ class Character:
         if random.choice([True, False]):
             if DEBUG:
                 print(f"DEBUG: {self.name} tente de se déplacer depuis {self.current_room.name}")
-            
             possible_exits = []
             for direction, room in self.current_room.exits.items():
                 if room is not None:
                     possible_exits.append((direction, room))
-            
             if possible_exits:
                 direction, new_room = random.choice(possible_exits)
                 old_room = self.current_room.name
-                
                 if self.name.lower() in self.current_room.inventory.npcs:
                     del self.current_room.inventory.npcs[self.name.lower()]
-                
                 self.current_room = new_room
                 new_room.inventory.add_npc(self)
-                
                 print(f"\n{'-'*50}")
                 print(f"Déplacement de {self.name}:")
                 print(f"- Départ de : {old_room}")
                 print(f"- Direction : {direction}")
                 print(f"- Arrivée à : {new_room.name}")
                 print(f"{'-'*50}")
-                
                 return True
             if DEBUG:
                 print(f"DEBUG: {self.name} ne peut pas se déplacer - aucune sortie disponible")
             return False
-            
         print(f"\n{self.name} reste dans {self.current_room.name}")
         return False

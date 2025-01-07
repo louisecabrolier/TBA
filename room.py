@@ -1,53 +1,59 @@
+"""Module gérant les salles du jeu d'aventure"""
 from inventory import Inventory
 class Room:
+    """Classe représentant une salle/pièce du jeu avec ses attributs et méthodes"""
 
-
-
-    # Define the constructor.
-    def __init__(self, name, description, image = None): #allows_dropping=True):
+    def __init__(self, name, description, image = None):
+        """"Initialise une nouvelle salle
+        
+        Args:
+            name (str): Nom de la salle
+            description (str): Description détaillée de la salle
+            image (str, optional): Chemin vers l'image de la salle
+        """
         self.name = name
         self.description = description
         self.exits = {}
         self.inventory = Inventory()
         self.characters = {}
         self.image = image
-        #self.allows_dropping = allows_dropping  # Par défaut, les pièces autorisent le dépôt d'objets
 
-   
-    # Define the get_exit method.
     def get_exit(self, direction):
-
-
-        # Return the room in the given direction if it exists.
+        """Retourne la salle dans la direction donnée si elle existe
+        
+        Args:
+            direction (str): Direction souhaitée ('N', 'S', 'E', 'O', etc.)
+        
+        Returns:
+            Room: Salle dans la direction donnée ou None si pas de sortie
+        """
         if direction in self.exits.keys():
             return self.exits[direction]
-        else:
-            return None
-   
-    # Return a string describing the room's exits.
-    def get_exit_string(self):
-        exit_string = "Sorties: "
-        for exit in self.exits.keys():
-            if self.exits.get(exit) is not None:
-                exit_string += exit + ", "
-        exit_string = exit_string.strip(", ")
-        return exit_string
+        return None
 
+    def get_exit_string(self):
+        """Retourne une chaîne décrivant les sorties disponibles
+        Returns:
+            str: Liste des sorties disponibles
+        """
+        exit_string = "Sorties: "
+        for direction in self.exits:
+            if self.exits.get(direction) is not None:
+                exit_string += direction + ", "
+        return exit_string.strip(", ")
 
     def get_inventory(self):
-        """
-        Récupère l'inventaire de la pièce.
-
-        :return: Chaîne de caractères listant les items.
+        """Récupère l'inventaire de la pièce
+        
+        Returns:
+            Inventory: L'inventaire de la pièce
         """
         return self.inventory
 
     def get_long_description(self):
+        """Retourne une description détaillée de la salle
+        
+        Returns:
+            str: Description complète incluant les sorties disponibles
+        """
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
-
-    def add_adjacent_room(self, room):
-        """Ajouter une pièce voisine"""
-        if room not in self.adjacent_rooms:
-            self.adjacent_rooms.append(room)
-
-            

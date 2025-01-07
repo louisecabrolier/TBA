@@ -1,3 +1,4 @@
+"""classe inventaire"""
 class Inventory:
     """
     Classe pour représenter un inventaire d'objets et de PNJ.
@@ -44,18 +45,15 @@ class Inventory:
         """
         if not self.items and not self.npcs:
             return "Il n'y a rien ici."
-        
         result = "On voit:\n"
         # Ajout des items
         for name, data in self.items.items():
             if not data["hidden"]:
                 item = data["item"]
                 result += f" - {name} : {item.description} ({item.poids} kg)\n"
-        
         # Ajout des PNJ
         for key, npc in self.npcs.items():
             result += f" - {key} : {npc.description}\n"
-        
         return result.rstrip()  # Enlève le dernier retour à la ligne
 
     def __setitem__(self, key, value):
