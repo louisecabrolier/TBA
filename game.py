@@ -26,7 +26,6 @@ class Game:
         self.characters = []
         self.messages_history = []
         self.is_game_over = False
-        self.door = Door()
         self.door_opened = False  #porte a déjà été ouverte?
         self.limited_exits = True  #ctrl des sorties limitées début du jeu
         self.carnaval_first_visit = True  #Initialement, Carnaval n'a pas été visité

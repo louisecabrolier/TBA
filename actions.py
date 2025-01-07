@@ -425,7 +425,15 @@ class Actions:
         else:
             item_name = list_of_words[1].lower()  # Normaliser le nom de l'item
             player = game.player
-            
+            current_room = player.current_room
+        
+            # Pièces autorisées pour drop
+            allowed_rooms = ["Forêt", "Rez-de-chaussé de la maison", "Château"]
+            current_room_name =  current_room.name.strip()
+            if current_room_name not in allowed_rooms:
+                print("Vous ne pouvez pas déposer d'objets ici.")
+                return
+        
 
             # Chercher l'item dans l'inventaire du joueur, en prenant en compte la casse
             item_found = None
