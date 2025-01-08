@@ -1,9 +1,10 @@
 """Module gérant les salles du jeu d'aventure"""
 from inventory import Inventory
+
 class Room:
     """Classe représentant une salle/pièce du jeu avec ses attributs et méthodes"""
 
-    def __init__(self, name, description, image = None):
+    def __init__(self, name, description, image = None, image_path = None):
         """"Initialise une nouvelle salle
         
         Args:
@@ -17,6 +18,9 @@ class Room:
         self.inventory = Inventory()
         self.characters = {}
         self.image = image
+        self.image_path = image_path
+        self.image = f"dessin/{image_path}"
+
 
     def get_exit(self, direction):
         """Retourne la salle dans la direction donnée si elle existe

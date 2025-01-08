@@ -42,7 +42,7 @@ class Actions:
 
 
 
-    def go(self, game, list_of_words, number_of_parameters):
+    def go(self, list_of_words, number_of_parameters):
         """
         Move the player in the direction specified by the parameter.
         The parameter must be a cardinal direction (N, E, S, O).
@@ -81,7 +81,7 @@ class Actions:
 
         """
 
-        player = game.player
+        player = self.player
         l = len(list_of_words)
         # If the number of parameters is incorrect, print an error message and return False.
         if l != number_of_parameters + 1:
@@ -101,64 +101,35 @@ class Actions:
 
 
 
-    def quitter(self, game, list_of_words, number_of_parameters):
+    def quitter(self, list_of_words, number_of_parameters):
         """
-        Quit the game.
-
-
-
+        Quitter le jeu.
 
         Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-
-
+            game (Game): L'objet du jeu.
+            list_of_words (list): La liste des mots dans la commande.
+            number_of_parameters (int): Le nombre de paramètres attendus pour la commande.
 
         Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-
-
-
-        Examples:
-
-
-
-
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> quitter(game, ["quitter"], 0)
-        True
-        >>> quitter(game, ["quitter", "N"], 0)
-        False
-        >>> quitter(game, ["quitter", "N", "E"], 0)
-        False
-
-
-
-
+            bool: True si la commande a été exécutée avec succès, False sinon.
         """
+        # Vérifie si le nombre de paramètres est correct
         l = len(list_of_words)
-        # If the number of parameters is incorrect, print an error message and return False.
         if l != number_of_parameters + 1:
             command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
+            print(f"Erreur : la commande '{command_word}' nécessite {number_of_parameters} paramètre(s).")
             return False
-
-        # Set the finished attribute of the game object to True.
-        player = game.player
-        msg = f"\nMerci {player.name} d'avoir joué. Au revoir.\n"
-        print(msg)
-        game.finished = True
+        
+        # Quitter le jeu
+        player = self.player
+        print(f"\nMerci {player.name} d'avoir joué. Au revoir.\n")
+        self.finished = True
         return True
 
 
 
 
-    def aide(self, game, list_of_words, number_of_parameters):
+    def aide(self, list_of_words, number_of_parameters):
         """
         Print the list of available commands.
 
@@ -208,7 +179,7 @@ class Actions:
 
         # Print the list of available commands.
         print("\nVoici les commandes disponibles:")
-        for command in game.commands.values():
+        for command in self.commands.values():
             print("\t- " + str(command))
         print()
         return True
@@ -216,7 +187,7 @@ class Actions:
 
 
 
-    def history(self, game, list_of_words, number_of_parameters):
+    def history(self, list_of_words, number_of_parameters):
         """
         Affiche l'historique des pièces visitées par le joueur.
 
@@ -260,7 +231,7 @@ class Actions:
             return False
 
         # Afficher l'historique des pièces visitées.
-        history = game.player.get_history()
+        history = self.player.get_history()
         print(history)
         return True
 
@@ -271,7 +242,7 @@ class Actions:
 
 
 
-    def back(self, game, list_of_words, number_of_parameters):
+    def back(self, list_of_words, number_of_parameters):
         """
         Move the player back to the previous position.
            
@@ -290,7 +261,7 @@ class Actions:
 
 
 
-        player = game.player
+        player = self.player
         l = len(list_of_words)
 
         # If the number of parameters is incorrect, print an error message and return False.
@@ -320,7 +291,7 @@ class Actions:
 
 
 #inventaire
-    def inventory(self, game, list_of_words, number_of_parameters):
+    def inventory(self,list_of_words, number_of_parameters):
         """
         Display the player's inventory.
 
@@ -345,17 +316,17 @@ class Actions:
 
         # Utilisation du player directement depuis l'objet game
         print("\nVotre inventaire :")
-        print(game.player.get_inventory())
+        print(self.player.get_inventory())
         return True
 
 
     # Dans votre fonction look
-    def look(self, game):
+    def look(self, list_of_words, number_of_parameters):
         """
         Permet au joueur de regarder autour de lui ou un objet spécifique.
         Ne montre que les PNJ visibles (annonceur au début, puis tous après lui avoir parlé).
         """
-        current_room = game.player.current_room
+        current_room = self.player.current_room
         # Description de la pièce
         print(current_room.description)
 
@@ -379,7 +350,7 @@ class Actions:
 
 
 
-    def take(self, game, list_of_words, number_of_parameters):
+    def take(self, list_of_words, number_of_parameters):
         """
         Permet au joueur de prendre un objet.
         """
@@ -390,7 +361,7 @@ class Actions:
 
         # Récupérer l'objet à prendre
         item_name = list_of_words[1].lower()  # Normaliser le nom de l'objet saisi
-        current_room = game.player.current_room
+        current_room = self.player.current_room #game 
 
         # Chercher l'objet dans l'inventaire de la pièce
         visible_items = current_room.inventory.get_visible_items()
@@ -404,12 +375,12 @@ class Actions:
 
         if item_found:
             # Vérifier le poids de l'objet
-            if game.player.get_current_weight() + item_found.poids > game.player.max_poids:
+            if self.player.get_current_weight() + item_found.poids > self.player.max_poids:
                 print("Vous avez trop de poids, vous ne pouvez pas prendre cet objet.")
                 return False
 
             # Ajouter l'objet à l'inventaire du joueur
-            game.player.inventory.add_item(item_found)
+            self.player.inventory.add_item(item_found)
             current_room.inventory.remove_item(item_name)
             print(f"Vous avez pris {item_found.name}.")
             return True
@@ -419,12 +390,12 @@ class Actions:
 
 
 
-    def drop(self, game, list_of_words):
+    def drop(self, list_of_words, number_of_parameters):
         """déposer un objet"""
         if len(list_of_words) < 2:
             print("Que voulez-vous déposer ?")
         item_name = list_of_words[1].lower()  # Normaliser le nom de l'item
-        player = game.player
+        player = self.player
         current_room = player.current_room
 
         # Pièces autorisées pour drop
@@ -449,37 +420,39 @@ class Actions:
             # Ajouter l'item à l'inventaire de la pièce
             player.current_room.inventory.add_item(item_found)
             print(f"Vous avez déposé l'objet '{name}'")
-        print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
+        else:
+            print(f"Vous n'avez pas de '{item_name}' dans votre inventaire.")
 
-    def check(self, game):
+    def check(self, list_of_words, number_of_parameters):
         """ Affiche le contenu de l'inventaire du joueur """
-        if not game.player.inventory.items:
+        if not self.player.inventory.items:
             print("Votre inventaire est vide")
-        print("Votre inventaire contient :")
-        for item_name, data in game.player.inventory.items.items():
+        else:
+            print("Votre inventaire contient :")
+            for item_name, data in self.player.inventory.items.items():
             # Accède à l'instance de l'objet dans le dictionnaire
-            item = data["item"]
-            print(f"- {item_name}: {item.description} ({item.poids} kg)")
+                item = data["item"]
+                print(f"- {item_name}: {item.description} ({item.poids} kg)")
 
 
 
-    def charge(self, game):
+    def charge(self, list_of_words, number_of_parameters):
         """charger le beamer"""
-        player = game.player
+        player = self.player
         #beamer = player.inventory.get("beamer")
         beamer = player.inventory["beamer"]
         if not beamer:
             print("Vous ne posséder pas de beamer pour le charger.")
         beamer.charge(player.current_room)
 
-    def teleporte(self, game):
+    def teleporte(self, list_of_words, number_of_parameters):
         """se téléporter"""
-        player = game.player
+        player = self.player
         beamer = player.inventory["beamer"]
         if not beamer:
             print("Vous ne possédez pas de beamer pour l'utiliser.")
 
-    def talk(self, game, list_of_words):
+    def talk(self, list_of_words, number_of_parameters):
         """
         Permet au joueur d'interagir avec un PNJ.
         Les PNJ supplémentaires apparaissent après avoir parlé à l'annonceur.
@@ -490,7 +463,7 @@ class Actions:
 
         # Récupérer le nom du PNJ avec la casse d'origine
         npc_name = ' '.join(list_of_words[1:])
-        current_room = game.player.current_room
+        current_room = self.player.current_room
 
         # Chercher le PNJ dans la pièce actuelle en ignorant la casse
         found_npc = None
@@ -509,11 +482,11 @@ class Actions:
             print(f"\n{found_npc.name} (dans {found_npc.current_room.name}) : {message}\n")
 
             # Si c'est l'annonceur et que c'est la première conversation
-            if found_npc.name.lower() == "annonceur" and not hasattr(game, 'talked_to_announcer'):
-                game.talked_to_announcer = True
+            if found_npc.name.lower() == "annonceur" and not hasattr(self, 'talked_to_announcer'):
+                self.talked_to_announcer = True
 
                 # Faire apparaître les autres PNJ
-                for room in game.rooms:
+                for room in self.rooms:
                     for npc in room.inventory.npcs.values():
                         if hasattr(npc, 'visible'):
                             npc.visible = True
@@ -547,7 +520,7 @@ class Actions:
 
 
         # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
-        for room in game.rooms:
+        for room in self.rooms:
             for npc in room.inventory.npcs.values():
                 # Ne pas mentionner les PNJ invisibles
                 if hasattr(npc, 'visible') and not npc.visible:
@@ -561,7 +534,7 @@ class Actions:
         return False
 
 
-    def give(self, game, list_of_words):
+    def give(self, list_of_words, number_of_parameters):
         """donner un objet à un pnj"""
         if len(list_of_words) != 3:
             print("Usage : give <personnage> <objet>")
@@ -569,10 +542,10 @@ class Actions:
 
         target = list_of_words[1].lower()
         item_name = list_of_words[2].lower()
-        current_room = game.player.current_room
+        current_room = self.player.current_room
 
         item_found = None
-        for name, data in game.player.inventory.items.items():
+        for name, data in self.player.inventory.items.items():
             if name.lower() == item_name:
                 item_found = data["item"]
                 break
@@ -587,33 +560,33 @@ class Actions:
                 return False
 
             if item_name == "potion":
-                game.player.inventory.remove_item("potion")
-                game.victory_checker.garde_convinced = True
-                chateau_room = next((room for room in game.rooms if room.name == "Château"), None)
+                self.player.inventory.remove_item("potion")
+                self.victory_checker.garde_convinced = True
+                chateau_room = next((room for room in self.rooms if room.name == "Château"), None)
                 if chateau_room:
-                    game.player.current_room = "Château"
-                    game.victory_checker.is_in_chateau = True
+                    self.player.current_room = "Château"
+                    self.victory_checker.is_in_chateau = True
                     print("Le garde accepte votre potion et vous laisse entrer dans le château.")
-                    game.update_victory_conditions(False)  # Mise à jour silencieuse
+                    self.update_victory_conditions(False)  # Mise à jour silencieuse
                     return True
 
             elif item_name in ["pierre", "bague"]:
-                if not hasattr(game.victory_checker, "objects_given"):
-                    game.victory_checker.objects_given = set()
+                if not hasattr(self.victory_checker, "objects_given"):
+                    self.victory_checker.objects_given = set()
 
-                game.victory_checker.objects_given.add(item_name)
-                game.player.inventory.remove_item(item_name)
+                self.victory_checker.objects_given.add(item_name)
+                self.player.inventory.remove_item(item_name)
 
-                if game.victory_checker.objects_given == {"pierre", "bague"}:
-                    game.victory_checker.garde_convinced = True
-                    chateau_room = next((room for room in game.rooms
+                if self.victory_checker.objects_given == {"pierre", "bague"}:
+                    self.victory_checker.garde_convinced = True
+                    chateau_room = next((room for room in self.rooms
                     if room.name == "Château"), None)
                     if chateau_room:
-                        game.player.current_room = "Château"
-                        game.victory_checker.is_in_chateau = True
+                        self.player.current_room = "Château"
+                        self.victory_checker.is_in_chateau = True
                         print("Le garde accepte la pierre scintillante"
                         "et la bague et vous laisse entrer dans le château.")
-                        game.update_victory_conditions(False)  # Mise à jour silencieuse
+                        self.update_victory_conditions(False)  # Mise à jour silencieuse
                         return True
                     print("Erreur : La salle 'Château' n'existe pas.")
                 print(f"Le garde accepte votre {item_name}, mais"

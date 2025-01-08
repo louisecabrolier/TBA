@@ -3,6 +3,7 @@
 # pylint: disable = too-many-statements
 # pylint: disable = too-many-branches
 # pylint: disable = too-many-nested-blocks
+# pylint: disable = import-outside-toplevel
 
 # Import modules
 from room import Room
@@ -15,7 +16,10 @@ from beamer import Beamer
 from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
-from interfacegraphique import GameGUI
+from pathlib import Path
+
+
+
 
 
 class Game:
@@ -59,7 +63,7 @@ class Game:
         # Setup commands
         aide = Command("aide", " : afficher cette aide", Actions.aide,0)
         self.commands["aide"] = aide
-        quitter = Command("quitter", " : quitter le jeu", Actions.quitter,0)
+        quitter = Command("quitter", " : quitter le jeu", Actions.quitter, 0)
         self.commands["quitter"] = quitter
         go = Command("go","<direction>: se déplacer dans une direction (N, E, S, O)", Actions.go,1)
         self.commands["go"] = go
@@ -86,35 +90,39 @@ class Game:
         self.commands["talk"]= talk
         give = Command("give", " :  donner les objets au garde", Actions.give, 1)
         self.commands["give"]= give
-
+        
+        # Création des salles avec leurs images
+        image_dir = Path("dessin")  # Dossier pour les images sur GitHub
+        
+        
         # Setup rooms
-        foret = Room("Forêt", "dans une forêt illuminée", "dessin/foret.png")
+        foret = Room("Forêt", "dans une forêt illuminée", "foret.jpg")
         self.rooms.append(foret)
-        entreecite = Room("Entrée de la cité", "à l'entrée de la cité")
+        entreecite = Room("Entrée de la cité", "à l'entrée de la cité", "entree-de-la-cite.jpg")
         self.rooms.append(entreecite)
-        carnaval = Room("carnaval", "au carnaval")
+        carnaval = Room("carnaval", "au carnaval", "carnaval.jpg")
         self.rooms.append(carnaval)
-        maisonrdc = Room("Rez-de-chaussé de la maison", "au rez-de-chaussée de votre maison")
+        maisonrdc = Room("Rez-de-chaussé de la maison", "au rez-de-chaussée de votre maison", "rdcmaison.jpg")
         self.rooms.append(maisonrdc)
-        maisonsoussol = Room("Sous-sol de la maison", "dans le sous-sol de la maison")
+        maisonsoussol = Room("Sous-sol de la maison", "dans le sous-sol de la maison", "maisonsoussol.jpg")
         self.rooms.append(maisonrdc)
-        alleeprincipale = Room("Allée principale du village", "dans l'allée principale du village")
+        alleeprincipale = Room("Allée principale du village", "dans l'allée principale du village", "alleeprincipale.jpg")
         self.rooms.append(alleeprincipale)
-        piedmontagneouest = Room("Pied de la montagne (Ouest)", "au pied ouest de la montagne")
+        piedmontagneouest = Room("Pied de la montagne (Ouest)", "au pied ouest de la montagne", "piedouest.jpg")
         self.rooms.append(piedmontagneouest)
-        marche = Room("Marché", "au marché")
+        marche = Room("Marché", "au marché", "marche.jpg")
         self.rooms.append(marche)
-        piedmonc = Room("Pied de la montagne (Centre)", "au pied central de la montagne")
+        piedmonc = Room("Pied de la montagne (Centre)", "au pied central de la montagne", "piedcentre.jpg")
         self.rooms.append(piedmonc)
-        mono = Room("Montagne (chemin Ouest)", "sur la montagne coté ouest")
+        mono = Room("Montagne (chemin Ouest)", "sur la montagne coté ouest", "mono.jpg")
         self.rooms.append(mono)
-        chateau = Room("Château", "au château")
+        chateau = Room("Château", "au château", "chateau.jpg")
         self.rooms.append(chateau)
-        montagnesombre = Room("Montagne sombre", "sur une montagne sombre")
+        montagnesombre = Room("Montagne sombre", "sur une montagne sombre", "montagnesombre.jpg")
         self.rooms.append(montagnesombre)
-        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise")
+        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise", "endroitinconnu.jpg")
         self.rooms.append(endroitinconnu)
-        bordcite = Room("Bord de la cité","au bord de la cité")
+        bordcite = Room("Bord de la cité","au bord de la cité", "bordcite.jpg")
         self.rooms.append(bordcite)
 
         # Create exits for rooms
@@ -132,6 +140,7 @@ class Game:
         montagnesombre.exits = {"N":None, "E":endroitinconnu, "S" : piedmonc, "O" : chateau}
         endroitinconnu.exits = {"N" :None, "E" : None, "S" : None, "O" : montagnesombre}
         bordcite.exits = {"N" : carnaval, "E" : None, "S" : None, "O" : None}
+
 
 
 
@@ -433,7 +442,7 @@ class Game:
         mode = input("Choisissez un mode : 'console' ou 'gui' : ").strip().lower()
         if mode == "gui":
             print("Lancement de l'interface graphique...")
-            #from interfacegraphique import GameGUI
+            from interfacegraphique import GameGUI
             game = Game()  # Create a new game instance
             app = GameGUI(game)  # Pass the game instance to GameGUI
             app.run()
