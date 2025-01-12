@@ -1,6 +1,7 @@
 """défaite"""
 #Définir les conditions de défaite
 #si tu vas dans endroitinconnu
+#si tu parles au villageois
 
 class CheckDefeat:
     """conditions de défaite"""

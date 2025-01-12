@@ -17,9 +17,15 @@ from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
 from pathlib import Path
+from door import Door
 
 
-
+# Au début du fichier game.py
+try:
+    import tkinter as tk
+    from gui_tkinter import GameGUI
+except ImportError:
+    pass
 
 
 class Game:
@@ -36,6 +42,7 @@ class Game:
         self.messages_history = []
         self.is_game_over = False
         self.door_opened = False  #porte a déjà été ouverte?
+        self.door = Door()
         self.limited_exits = True  #ctrl des sorties limitées début du jeu
         self.carnaval_first_visit = True  #Initialement, Carnaval n'a pas été visité
         self.foret = None
@@ -94,7 +101,6 @@ class Game:
         # Création des salles avec leurs images
         image_dir = Path("dessin")  # Dossier pour les images sur GitHub
         
-        
         # Setup rooms
         foret = Room("Forêt", "dans une forêt illuminée", "foret.jpg")
         self.rooms.append(foret)
@@ -105,7 +111,7 @@ class Game:
         maisonrdc = Room("Rez-de-chaussé de la maison", "au rez-de-chaussée de votre maison", "rdcmaison.jpg")
         self.rooms.append(maisonrdc)
         maisonsoussol = Room("Sous-sol de la maison", "dans le sous-sol de la maison", "maisonsoussol.jpg")
-        self.rooms.append(maisonrdc)
+        self.rooms.append(maisonsoussol)
         alleeprincipale = Room("Allée principale du village", "dans l'allée principale du village", "alleeprincipale.jpg")
         self.rooms.append(alleeprincipale)
         piedmontagneouest = Room("Pied de la montagne (Ouest)", "au pied ouest de la montagne", "piedouest.jpg")
@@ -118,9 +124,9 @@ class Game:
         self.rooms.append(mono)
         chateau = Room("Château", "au château", "chateau.jpg")
         self.rooms.append(chateau)
-        montagnesombre = Room("Montagne sombre", "sur une montagne sombre", "montagnesombre.jpg")
+        montagnesombre = Room("Montagne sombre", "sur une montagne sombre", "montagnesombre2.jpg")
         self.rooms.append(montagnesombre)
-        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise", "endroitinconnu.jpg")
+        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise", "falaise.jpg")
         self.rooms.append(endroitinconnu)
         bordcite = Room("Bord de la cité","au bord de la cité", "bordcite.jpg")
         self.rooms.append(bordcite)
@@ -353,6 +359,21 @@ class Game:
                 return False
             print("\nL'annonceur n'est pas ici.\n")
             return False
+          # Gestion spéciale des dialogues
+        if command_word == "talk" and len(list_of_words) > 1:
+            npc_name = list_of_words[1].lower()
+            current_room = self.player.current_room
+            # Vérifier si le PNJ est dans l'inventaire de la pièce actuelle
+            if npc_name in current_room.inventory.npcs:
+                npc = current_room.inventory.npcs[npc_name]
+                print(f"\n{npc.name} (dans {current_room.name}) : {npc.get_dialog()}")
+                # Si c'est le villageois, activer la condition de défaite
+                if npc_name == "villageois":
+                    self.defeat_checker.has_talked_to_villageois = True  # Mettre directement à True
+                    print("\nDÉFAITE: Vous avez été infecté par le villageois!\n")
+                    self.finished = True  # Terminer le jeu immédiatement
+                    return True  # Indiquer que le jeu doit se terminer
+                # Si c'est l'annonceur au carnaval
 # Ajoutez cette partie pour gérer l'interaction avec le garde
         if command_word == "give" and len(list_of_words) > 2:
             item_name = list_of_words[2].lower()
@@ -387,22 +408,22 @@ class Game:
             if direction not in directions_values:
                 print("\nDirection invalide.\n")
             list_of_words[1] = direction
-            if self.limited_exits:
-                # Restriction des sorties
-                if self.player.current_room == self.entreecite and direction not in {"O"}:
-                    print("Vous ne pouvez aller qu'à l'ouest pour l'instant.")
-            # Vérifier si on est dans la forêt et qu'on va vers la cité
+        # Vérifier si on est dans la forêt et qu'on va vers la cité
             if self.player.current_room == self.foret and direction == "N":
-                # Si la porte n'a pas encore été ouverte
-                if not self.door_opened:
-                    # Vérifier si le joueur a la clé
-                    has_key = "Clef" in self.player.inventory.items
-                    # items est un dictionnaire, pas une méthode
-                    if not has_key:
-                        print("\nVous ne pouvez pas entrer dans la cité sans la clé.\n")
-                    print("\nVous ouvrez les portes de la cité avec la clé "
+                # Tenter d'ouvrir la porte avec l'inventaire actuel
+                self.door.try_open(self.player.inventory.items)
+                if not self.door.is_open:
+                    # Si la porte ne s'est pas ouverte, on reste dans la forêt
+                    return False
+                # Si la porte s'est ouverte, on continue avec le déplacement
+                print("\nVous ouvrez les portes de la cité avec la clé "
                     "et celles-ci se referment derrière vous.")
-                    self.is_open = True  # La porte est maintenant ouverte
+                self.door.close()
+            # Vérifier les restrictions de déplacement à l'entrée de la cité
+            if self.player.current_room == self.entreecite and self.limited_exits:
+                if direction != "O":  # Si la direction n'est pas Ouest
+                    print("\nVous ne pouvez aller qu'à l'ouest pour l'instant.\n")
+                    return False
             directions_valides = set()
             for direction_possible, next_room in self.player.current_room.exits.items():
                 if next_room is not None:
@@ -440,16 +461,22 @@ class Game:
         """Point d'entrée principal du jeu"""
         print("Bienvenue dans le jeu !")
         mode = input("Choisissez un mode : 'console' ou 'gui' : ").strip().lower()
+        
+        game = Game()
+        
         if mode == "gui":
             print("Lancement de l'interface graphique...")
-            from interfacegraphique import GameGUI
-            game = Game()  # Create a new game instance
-            app = GameGUI(game)  # Pass the game instance to GameGUI
-            app.run()
-        print("Lancement en mode console...")
-        game = Game()
-        game.play()
-
+            try:
+                from gui_tkinter import GameGUI  # Nouveau fichier avec l'interface Tkinter
+                app = GameGUI(game)
+                app.run()
+            except Exception as e:
+                print(f"Erreur lors du lancement de l'interface graphique : {e}")
+                print("Lancement en mode console...")
+                game.play()
+        else:
+            print("Lancement en mode console...")
+            game.play()
 
 if __name__ == "__main__":
     Game.main()
