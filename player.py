@@ -1,6 +1,7 @@
 # Define the Player class.
 from room import Room
 from inventory import Inventory
+from item import Item
 
 class Player():
 
@@ -93,7 +94,12 @@ class Player():
         else:
             print("Votre inventaire contient :")
             for item_name, item in self.inventory.items.items():
-                print(f"- {item_name}: {item.description} ({item.poids} kg)")
+                if isinstance(item, Item):  # Vérifie si `item` est une instance d'Item
+                    print(f"- {item_name}: {item.description} ({item.poids} kg)")
+                else:
+                    print(f"- {item_name}")
+
+
 
 
         

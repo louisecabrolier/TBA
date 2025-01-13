@@ -277,7 +277,6 @@ class Game:
                 self.player.has_talked_to_garde)
 
     def process_command(self, command_string) -> None:
-        # Code existant...
         command_string = command_string.strip()
         if command_string == "":
             return
