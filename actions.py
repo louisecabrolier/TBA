@@ -496,9 +496,6 @@ class Actions:
 
         return False
 
- 
-
-
     def give(self, list_of_words, number_of_parameters):
         """donner un objet à un pnj"""
         if len(list_of_words) != 3:

@@ -16,17 +16,7 @@ from beamer import Beamer
 from config import DEBUG
 from checkvictory import CheckVictory
 from checkdefeat import CheckDefeat
-from pathlib import Path
 from door import Door
-
-
-# Au début du fichier game.py
-try:
-    import tkinter as tk
-    from gui_tkinter import GameGUI
-except ImportError:
-    pass
-
 
 class Game:
     """classe jeu"""
@@ -98,38 +88,35 @@ class Game:
         self.commands["talk"]= talk
         give = Command("give", " :  donner les objets au garde", Actions.give, 1)
         self.commands["give"]= give
-        
-        # Création des salles avec leurs images
-        image_dir = Path("dessin")  # Dossier pour les images sur GitHub
-        
-        # Setup rooms
-        foret = Room("Forêt", "dans une forêt illuminée", "foret.jpg")
+
+        # Pièces
+        foret = Room("Forêt", "dans une forêt illuminée")
         self.rooms.append(foret)
-        entreecite = Room("Entrée de la cité", "à l'entrée de la cité", "entree-de-la-cite.jpg")
+        entreecite = Room("Entrée de la cité", "à l'entrée de la cité")
         self.rooms.append(entreecite)
-        carnaval = Room("carnaval", "au carnaval", "carnaval.jpg")
+        carnaval = Room("carnaval", "au carnaval")
         self.rooms.append(carnaval)
-        maisonrdc = Room("Rez-de-chaussé de la maison", "au rez-de-chaussée de votre maison", "rdcmaison.jpg")
+        maisonrdc = Room("Rez-de-chaussé de la maison", "au rez-de-chaussée de votre maison")
         self.rooms.append(maisonrdc)
-        maisonsoussol = Room("Sous-sol de la maison", "dans le sous-sol de la maison", "maisonsoussol.jpg")
+        maisonsoussol = Room("Sous-sol de la maison", "dans le sous-sol de la maison")
         self.rooms.append(maisonsoussol)
-        alleeprincipale = Room("Allée principale du village", "dans l'allée principale du village", "alleeprincipale.jpg")
+        alleeprincipale = Room("Allée principale du village", "dans l'allée principale du village")
         self.rooms.append(alleeprincipale)
-        piedmontagneouest = Room("Pied de la montagne (Ouest)", "au pied ouest de la montagne", "piedouest.jpg")
+        piedmontagneouest = Room("Pied de la montagne (Ouest)", "au pied ouest de la montagne")
         self.rooms.append(piedmontagneouest)
-        marche = Room("Marché", "au marché", "marche.jpg")
+        marche = Room("Marché", "au marché")
         self.rooms.append(marche)
-        piedmonc = Room("Pied de la montagne (Centre)", "au pied central de la montagne", "piedcentre.jpg")
+        piedmonc = Room("Pied de la montagne (Centre)", "au pied central de la montagne")
         self.rooms.append(piedmonc)
-        mono = Room("Montagne (chemin Ouest)", "sur la montagne coté ouest", "mono.jpg")
+        mono = Room("Montagne (chemin Ouest)", "sur la montagne coté ouest")
         self.rooms.append(mono)
-        chateau = Room("Château", "au château", "chateau.jpg")
+        chateau = Room("Château", "au château")
         self.rooms.append(chateau)
-        montagnesombre = Room("Montagne sombre", "sur une montagne sombre", "montagnesombre2.jpg")
+        montagnesombre = Room("Montagne sombre", "sur une montagne sombre")
         self.rooms.append(montagnesombre)
-        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise", "falaise.jpg")
+        endroitinconnu = Room("Endroit inconnu", "au bord d'une falaise")
         self.rooms.append(endroitinconnu)
-        bordcite = Room("Bord de la cité","au bord de la cité", "bordcite.jpg")
+        bordcite = Room("Bord de la cité","au bord de la cité")
         self.rooms.append(bordcite)
 
         # Create exits for rooms
@@ -283,7 +270,6 @@ class Game:
                         villageois = room.inventory.npcs["villageois"]
                         villageois.move()
                         break  # On sort dès qu'on a trouvé et déplacé le PNJ
-    
 
     def check_game_state(self):
         """Vérifie l'état du jeu et retourne un message si le jeu est terminé"""
@@ -358,23 +344,9 @@ class Game:
         """Point d'entrée principal du jeu"""
         print("Bienvenue dans le jeu !")
         print("Entrez 'aide' pour connaître les commandes du jeu.")
-        mode = input("Choisissez un mode : 'console' ou 'gui' : ").strip().lower()
-        
         game = Game()
-        
-        if mode == "gui":
-            print("Lancement de l'interface graphique...")
-            try:
-                from gui_tkinter import GameGUI  # Nouveau fichier avec l'interface Tkinter
-                app = GameGUI(game)
-                app.run()
-            except Exception as e:
-                print(f"Erreur lors du lancement de l'interface graphique : {e}")
-                print("Lancement en mode console...")
-                game.play()
-        else:
-            print("Lancement en mode console...")
-            game.play()
+        print("Vous êtes un marchand s'étant aventuré dans la forêt afin de trouver des objets à vendre.")
+        game.play()
 
 if __name__ == "__main__":
     Game.main()

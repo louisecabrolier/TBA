@@ -21,7 +21,7 @@ class Inventory:
         """
         Retourne uniquement les objets visibles dans l'inventaire.
         """
-        return {name: data["item"] for name, data in self.items.items() 
+        return {name: data["item"] for name, data in self.items.items()
                 if not data["hidden"]}
 
     def remove_item(self, item_name):
@@ -41,18 +41,15 @@ class Inventory:
         """
         if not self.items and not self.npcs:
             return "Il n'y a rien ici."
-            
         result = "On voit:\n"
         # Ajout des items
         for name, data in self.items.items():
             if not data["hidden"]:
                 item = data["item"]
                 result += f" - {item.name} : {item.description} ({item.poids} kg)\n"
-        
         # Ajout des PNJ
         for key, npc in self.npcs.items():
             result += f" - {key} : {npc.description}\n"
-            
         return result.rstrip()
 
     def __setitem__(self, key, value):
@@ -80,17 +77,17 @@ class Inventory:
         :return: Le PNJ retiré ou None s'il n'existe pas
         """
         return self.npcs.pop(npc_name, None)
-    
+
     def reveal_item(self, item_name):
-            """
-            Révèle un item caché dans l'inventaire.
-            :param item_name: Nom de l'item à révéler (en minuscules)
-            """
-            # Chercher l'item en ignorant la casse
-            item_name_lower = item_name.lower()
-            if item_name_lower in self.items:
-                if self.items[item_name_lower]["hidden"]:
-                    self.items[item_name_lower]["hidden"] = False
-                    return True
-                return False  # L'item n'était pas caché
-            return False  # L'item n'existe pas dans l'inventaire
+        """
+        Révèle un item caché dans l'inventaire.
+        :param item_name: Nom de l'item à révéler (en minuscules)
+        """
+        # Chercher l'item en ignorant la casse
+        item_name_lower = item_name.lower()
+        if item_name_lower in self.items:
+            if self.items[item_name_lower]["hidden"]:
+                self.items[item_name_lower]["hidden"] = False
+                return True
+            return False  # L'item n'était pas caché
+        return False  # L'item n'existe pas dans l'inventaire
