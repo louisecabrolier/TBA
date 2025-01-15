@@ -1,6 +1,5 @@
 """classe joueur""" # pylint: disable=too-many-instance-attributes
 from inventory import Inventory
-from item import Item
 
 class Player():
     """classe joueur"""
@@ -14,20 +13,12 @@ class Player():
         self.has_spoken_to_merchant = False  # Indique si le joueur a parlé au marchand
         self.has_talked_to_annonceur = False
         self.has_talked_to_garde = False
-<<<<<<< HEAD
     """
     # Define the move method.
     def move(self, direction):
         
         direction = direction.lower()
         next_room = self.current_room.exits.get(direction)
-=======
-
-    # Define the move method.
-    def move(self, direction):
-        """ehh"""
-        next_room = self.current_room.exits[direction]
->>>>>>> temp
         if next_room is None:
             return False
           # Si la commande est vide, ne rien faire
@@ -40,11 +31,7 @@ class Player():
         self.current_room = next_room
         print(self.current_room.get_long_description())
         return True
-<<<<<<< HEAD
     """
-=======
-
->>>>>>> temp
     #Méthode pour revenir en arrière
     def go_back(self):
         """Vérifier si l'historique est vide"""
@@ -58,7 +45,6 @@ class Player():
 
     def get_history(self):
         """avoir lhistorique"""
-<<<<<<< HEAD
         #nomsendroits = [room.name for room in self.history]
         #if nomsendroits:
             #return "\n".join(nomsendroits)
@@ -71,12 +57,6 @@ class Player():
             result += f"- {room.name}\n"
         return result.rstrip()
 
-=======
-        nomsendroits = [room.name for room in self.history]
-        if nomsendroits:
-            return "\n".join(nomsendroits)
-        return "Aucune pièce visitée"
->>>>>>> temp
 
     def get_inventory(self):
         """
@@ -93,10 +73,7 @@ class Player():
             result += f"- {item.name} : {item.description} ({item.poids} kg)\n"
         return result.rstrip()
 
-<<<<<<< HEAD
 
-=======
->>>>>>> temp
     def get_current_weight(self):
         """pr pas que l'inventaire nait une val maximum a 10kg"""
         return sum(data["item"].poids for data in self.inventory.items.values())

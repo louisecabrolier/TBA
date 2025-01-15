@@ -38,5 +38,3 @@ class Beamer(Item):
             "- Utilisez-le pour vous téléporter dans cette pièce avec la commande 'teleporte'.\n"
             "Attention : il doit être rechargé après chaque utilisation."
         )
-
-    

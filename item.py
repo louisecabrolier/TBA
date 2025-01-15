@@ -11,4 +11,3 @@ class Item:
         """blabla"""
         return f"{self.name} : {self.description} ({self.poids} kg)"
 
-
