@@ -6,15 +6,13 @@ class Room:
 
 
     # Define the constructor.
-    def __init__(self, name, description, image = None #allows_dropping=True):
+    def __init__(self, name, description, image = None):
         self.name = name
         self.description = description
         self.exits = {}
         self.inventory = Inventory()
         self.characters = {}
         self.image = image
-        self.image_path = image_path
-        self.image = f"dessin/{image_path}"
 
 
     def get_exit(self, direction):
