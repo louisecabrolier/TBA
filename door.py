@@ -20,4 +20,3 @@ class Door:
 
     def close(self):
         self.is_open = False
-

@@ -3,16 +3,11 @@ from inventory import Inventory
 from inventory import Inventory
 
 class Room:
-    """Classe représentant une salle/pièce du jeu avec ses attributs et méthodes"""
 
-    def __init__(self, name, description, image = None, image_path = None):
-        """"Initialise une nouvelle salle
-        
-        Args:
-            name (str): Nom de la salle
-            description (str): Description détaillée de la salle
-            image (str, optional): Chemin vers l'image de la salle
-        """
+
+
+    # Define the constructor.
+    def __init__(self, name, description, image = None #allows_dropping=True):
         self.name = name
         self.description = description
         self.exits = {}

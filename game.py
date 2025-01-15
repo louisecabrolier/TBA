@@ -327,8 +327,8 @@ class Game:
         has_talked_to_annonceur = getattr(self.player, 'has_talked_to_annonceur', False)
         self.victory_checker.update_condition("annonceur", has_talked_to_annonceur)
 
-    def process_command(self, command_string):
-        """Traite la commande entrée par le joueur"""
+    def process_command(self, command_string) -> None:
+        # Code existant...
         command_string = command_string.strip()
         if command_string == "":
             return False
