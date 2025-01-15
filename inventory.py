@@ -1,10 +1,13 @@
+"""classe inventaire"""
 class Inventory:
     """
     Classe pour représenter un inventaire d'objets et de PNJ.
     """
+
+
     def __init__(self):
         self.items = {}  # Dictionnaire associant des items à leur nom
-        self.npcs = {}  # Dictionnaire associant des PNJ à leur nom
+        self.npcs = {}   # Dictionnaire associant des PNJ à leur nom
 
     def add_item(self, item, hidden=False):
         """
@@ -12,14 +15,14 @@ class Inventory:
         :param item: Instance de la classe Item
         :param hidden: Indique si l'objet est caché
         """
-        # Store the item and its hidden status as a dictionary
-        self.items[item.name] = {"item": item, "hidden": hidden}
+        self.items[item.name.lower()] = {"item": item, "hidden": hidden}
 
     def get_visible_items(self):
         """
-        Retourne uniquement les objets visibles dans l'inventaire (ceux dont 'hidden' est False).
+        Retourne uniquement les objets visibles dans l'inventaire.
         """
-        return {name: data["item"] for name, data in self.items.items() if not data["hidden"]}
+        return {name: data["item"] for name, data in self.items.items() 
+                if not data["hidden"]}
 
     def remove_item(self, item_name):
         """
@@ -27,15 +30,9 @@ class Inventory:
         :param item_name: Nom de l'item à retirer
         :return: L'item retiré ou None s'il n'existe pas
         """
-        return self.items.pop(item_name, None)
-
-    def reveal_item(self, item_name):
-        """
-        Révèle un item caché.
-        :param item_name: Nom de l'item à révéler
-        """
-        if item_name in self.items:
-            self.items[item_name]["hidden"] = False
+        if item_name.lower() in self.items:
+            return self.items.pop(item_name.lower())["item"]
+        return None
 
     def get_inventory(self):
         """
@@ -44,27 +41,30 @@ class Inventory:
         """
         if not self.items and not self.npcs:
             return "Il n'y a rien ici."
-        
+            
         result = "On voit:\n"
         # Ajout des items
         for name, data in self.items.items():
             if not data["hidden"]:
                 item = data["item"]
-                result += f" - {name} : {item.description} ({item.poids} kg)\n"
+                result += f" - {item.name} : {item.description} ({item.poids} kg)\n"
         
         # Ajout des PNJ
         for key, npc in self.npcs.items():
             result += f" - {key} : {npc.description}\n"
-        
-        return result.rstrip()  # Enlève le dernier retour à la ligne
+            
+        return result.rstrip()
 
     def __setitem__(self, key, value):
         """Permet l'ajout d'un item avec la syntaxe de dictionnaire."""
-        self.items[key] = {"item": value, "hidden": False}
+        if hasattr(value, 'name'):
+            self.items[value.name.lower()] = {"item": value, "hidden": False}
+        else:
+            self.items[key.lower()] = {"item": value, "hidden": False}
 
     def __getitem__(self, key):
         """Permet d'accéder à un item avec la syntaxe de dictionnaire."""
-        return self.items[key]["item"]
+        return self.items[key.lower()]["item"]
 
     def add_npc(self, npc):
         """
@@ -80,3 +80,17 @@ class Inventory:
         :return: Le PNJ retiré ou None s'il n'existe pas
         """
         return self.npcs.pop(npc_name, None)
+    
+    def reveal_item(self, item_name):
+            """
+            Révèle un item caché dans l'inventaire.
+            :param item_name: Nom de l'item à révéler (en minuscules)
+            """
+            # Chercher l'item en ignorant la casse
+            item_name_lower = item_name.lower()
+            if item_name_lower in self.items:
+                if self.items[item_name_lower]["hidden"]:
+                    self.items[item_name_lower]["hidden"] = False
+                    return True
+                return False  # L'item n'était pas caché
+            return False  # L'item n'existe pas dans l'inventaire
