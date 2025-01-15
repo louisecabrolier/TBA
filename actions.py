@@ -1,26 +1,9 @@
 """Actions""" # pylint: disable = too-many-branches
-
-#import inventory
-#import room
-#from beamer import Beamer
-#from player import Player
-#from item import Item
-
-# The actions module contains the functions that are called when a command is executed.
-# Each function takes 3 parameters:
-# - game: the game object
-# - list_of_words: the list of words in the command
-# - number_of_parameters: the number of parameters expected by the command
-# The functions return True if the command was executed successfully, False otherwise.
-# The functions print an error message if the number of parameters is incorrect.
-# The error message is different depending on the number of parameters expected by the command.
+# pylint: disable = unused-argument 
+#on ne peut pas les enlever car nécessaire pour le fonctionnement du jeu
 
 
-
-
-
-
-
+from beamer import Beamer
 
 # The error message is stored in the MSG0 and MSG1 variables
 # and formatted with the command_word variable
@@ -30,55 +13,29 @@ MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 # The MSG1 variable is used when the command takes 1 parameter.
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 
-
-from beamer import Beamer
-
-
-
-
 class Actions:
     """définir les actions possibles dans le jeu"""
 
-
+    def __init__(self):
+        """initialisation"""
+        self.player = None
+        self.foret = None
+        self.door = None
+        self.entreecite = None
+        self.defeat_checker = None
+        self.carnaval = None
+        self.commands = None
+        self.carnaval_npcs_revealed = None
+        self.victory_checker = None
+        self.rooms = None
+        self.carnaval_first_visit = None
+        self.limited_exits = None
+        self.finished = None
 
 
     def go(self, list_of_words, number_of_parameters):
         """
-        Move the player in the direction specified by the parameter.
-        The parameter must be a cardinal direction (N, E, S, O).
-
-
-
-
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-
-
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-
-
-
-        Examples:
-
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> go(game, ["go", "N"], 1)
-        True
-        >>> go(game, ["go", "N", "E"], 1)
-        False
-        >>> go(game, ["go"], 1)
-        False
-
-
-
-
+        Faire bouger le joueur dans la direction donnée
         """
         # Vérification du nombre de paramètres
         if len(list_of_words) != number_of_parameters + 1:
@@ -98,8 +55,9 @@ class Actions:
             self.door.try_open(self.player.inventory.items)
             if not self.door.is_open:
                 return False
-            
-            print("\nVous ouvrez les portes de la cité avec la clé et celles-ci se referment derrière vous.")
+
+            print("\nVous ouvrez les portes de la cité avec la clé"
+            "et celles-ci se referment derrière vous.")
             print("Vous êtes maintenant dans l'entrée de la cité")
             self.player.history.append(self.player.current_room)
             self.player.current_room = self.entreecite
@@ -117,10 +75,10 @@ class Actions:
         if next_room is None:
             print("\nVous ne pouvez pas aller dans cette direction.\n")
             return False
-        
+
         # Ajouter la pièce actuelle à l'historique avant de se déplacer
         self.player.history.append(self.player.current_room)
-    
+
 
         # Déplacement du joueur
         self.player.current_room = next_room
@@ -131,7 +89,8 @@ class Actions:
             print(f"\nVous êtes dans {next_room.name}")
         elif next_room == self.carnaval and self.carnaval_first_visit:
             print("\nBienvenue au Carnaval ! Utilisez 'look' pour observer autour de vous.")
-            print("Parlez aux différentes personnes que vous verrez pour en savoir plus sur le jeu.")
+            print("Parlez aux différentes personnes"
+            "que vous verrez pour en savoir plus sur le jeu.")
             self.carnaval_first_visit = False
             self.limited_exits = False
         else:
@@ -158,9 +117,10 @@ class Actions:
         l = len(list_of_words)
         if l != number_of_parameters + 1:
             command_word = list_of_words[0]
-            print(f"Erreur : la commande '{command_word}' nécessite {number_of_parameters} paramètre(s).")
+            print(f"Erreur : la commande '{command_word}'"
+            "nécessite {number_of_parameters} paramètre(s).")
             return False
-        
+
         # Quitter le jeu
         player = self.player
         print(f"\nMerci {player.name} d'avoir joué. Au revoir.\n")
@@ -172,53 +132,14 @@ class Actions:
 
     def aide(self, list_of_words, number_of_parameters):
         """
-        Print the list of available commands.
-
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-
-
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-
-
-
-        Examples:
-
-
-
-
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> aide(game, ["aide"], 0)
-        True
-        >>> aide(game, ["aide", "N"], 0)
-        False
-        >>> aide(game, ["aide", "N", "E"], 0)
-        False
-
-
-
-
+        Donne la liste des commandes disponibles
         """
-
-
-
-
-        # If the number of parameters is incorrect, print an error message and return False.
         l = len(list_of_words)
         if l != number_of_parameters + 1:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
 
-        # Print the list of available commands.
         print("\nVoici les commandes disponibles:")
         for command in self.commands.values():
             print("\t- " + str(command))
@@ -231,38 +152,6 @@ class Actions:
     def history(self, list_of_words, number_of_parameters):
         """
         Affiche l'historique des pièces visitées par le joueur.
-
-
-
-
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-
-
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
-
-
-
-
-        Examples:
-
-
-
-
-        >>> from game import Game
-        >>> game = Game()
-        >>> game.setup()
-        >>> history(game, ["history"], 0)
-        True
-        >>> history(game, ["history", "N"], 0)
-        False
-        >>> history(game, ["history", "N", "E"], 0)
-        False
         """
         if len(list_of_words) != number_of_parameters + 1:
             command_word = list_of_words[0]
@@ -282,39 +171,23 @@ class Actions:
 
     def back(self, list_of_words, number_of_parameters):
         """
-        Move the player back to the previous position.
-           
-        Args:
-            game (Game): The game object.
-            list_of_words (list): The list of words in the command.
-            number_of_parameters (int): The number of parameters expected by the command.
-
-
-
-
-        Returns:
-            bool: True if the command was executed successfully, False otherwise.
+        Revenir à la position précédente
         """
-
-
-
-
         player = self.player
         l = len(list_of_words)
 
-        # If the number of parameters is incorrect, print an error message and return False.
+        #Si il n'y a pas le bon nombre de paramètres
         if l != number_of_parameters + 1:
             command_word = list_of_words[0]
             print(MSG0.format(command_word=command_word))
             return False
 
-        # Check if there is a previous position to return to.
+        #Vérifier qu'il y a bien une ancienne position
         if not player.history:
             print("Vous ne pouvez pas revenir en arrière,"
             "aucun déplacement précédent enregistré.")
             return False
 
-        # Pop the last position from the history and move the player back.
         previous_position = player.history.pop()
 
         player.position = previous_position
@@ -331,7 +204,8 @@ class Actions:
 #inventaire
     def inventory(self, list_of_words, number_of_parameters):
         """
-        Affiche l'inventaire du joueur.
+        Affiche l'inventaire du joueur
+        Même chose que check
         """
         return Actions.check(self, list_of_words, number_of_parameters)
 
@@ -345,10 +219,10 @@ class Actions:
         """
         # Obtention de la salle courante
         current_room = self.player.current_room
-        
+
         # Affichage du nom et de la description de la salle
         print(f"\nVous êtes {current_room.description}")
-        
+
         # Gestion des objets dans la pièce
         all_items = current_room.inventory.items  # Tous les objets de l'inventaire
         if not all_items:
@@ -368,19 +242,19 @@ class Actions:
 
         # Gestion des PNJ
         visible_npcs = []
-        
+
         if current_room == self.carnaval:
             # Dans le carnaval : l'annonceur est toujours visible initialement
             for npc in current_room.inventory.npcs.values():
                 # Si c'est l'annonceur ou le villageois (s'il est visible)
-                if npc.visible and (npc.name == "Annonceur" or 
-                                (npc.name == "Villageois" and npc.visible) or 
+                if npc.visible and (npc.name == "Annonceur" or
+                                (npc.name == "Villageois" and npc.visible) or
                                 (self.carnaval_npcs_revealed)):
                     visible_npcs.append(npc)
         else:
             # Pour les autres salles : tous les PNJ visibles
             visible_npcs = [npc for npc in current_room.inventory.npcs.values() if npc.visible]
-        
+
         # Affichage des PNJ
         if visible_npcs:
             print("\nPersonnages :")
@@ -407,9 +281,6 @@ class Actions:
         item_name = list_of_words[1].lower()
         current_room = self.player.current_room
 
-        print("\nDEBUG INFO:")
-        print(f"Recherche de l'item: '{item_name}'")
-        
         # Chercher l'item parmi les items visibles
         item_found = None
         for key, data in current_room.inventory.items.items():
@@ -430,8 +301,8 @@ class Actions:
             print(f"L'item n'est pas dans cette pièce.")
             return False
 
-        
-    
+
+
     def drop(self, list_of_words, number_of_parameters):
         """déposer un objet"""
         if len(list_of_words) < 2:
@@ -494,7 +365,7 @@ class Actions:
         try:
             # Vérifier si le beamer est dans l'inventaire
             beamer = self.player.inventory["beamer"]
-            if beamer and isinstance(beamer, Beamer):  # Vérifier que c'est bien un Beamer
+            if beamer and isinstance(beamer, Beamer):
                 # Utiliser le beamer pour la téléportation
                 beamer.teleporte(self.player)
                 # Afficher la description de la nouvelle pièce
@@ -565,7 +436,7 @@ class Actions:
                     self.player.has_talked_to_annonceur = True
                     # Mettre à jour la condition dans le victory checker
                     self.victory_checker.update_condition("annonceur", True)
-                    #Mettre à jour les sorties limitées = plus obligé d'aller à l'ouest après entreecite
+                    #Mettre à jour les sorties limitées
                     self.limited_exits = False
                     # Rendre les PNJ visibles dans la salle du carnaval
                     for character in self.characters:#use liste des perso de la classe Game
@@ -584,33 +455,39 @@ class Actions:
                     return False
                 print("\nL'annonceur n'est pas ici.\n")
                 return False
-                    #if self.player.current_room == self.carnaval and npc.name.lower() == "annonceur":
-                    #self.carnaval_npcs_revealed = True
             elif found_npc.name.lower() == "médecin":
                 # Révéler la potion si elle est présente et cachée
-                if "potion" in current_room.inventory.items and current_room.inventory.items["potion"]["hidden"]:
-                    current_room.inventory.reveal_item("potion")
-                    print("Le médecin te montre une potion cachée dans son sac !")
-                
+                if "potion" in current_room.inventory.items:
+                    potioncachee = current_room.inventory.items["potion"]["hidden"]
+                    if potioncachee:
+                        current_room.inventory.reveal_item("potion")
+                        print("Le médecin te montre une potion cachée dans son sac !")
+
             elif found_npc.name.lower() == "vendeuse":
                 # Révéler le tapis si présent et caché
-                if "tapis" in current_room.inventory.items and current_room.inventory.items["tapis"]["hidden"]:
-                    current_room.inventory.reveal_item("tapis")
-                    print("La vendeuse te montre un tapis posé dans un coin du carnaval !")
-                
+                if "tapis" in current_room.inventory.items:
+                    tapiscache = current_room.inventory.items["tapis"]["hidden"]
+                    if tapiscache:
+                        current_room.inventory.reveal_item("tapis")
+                        print("La vendeuse te montre un tapis posé"
+                        "dans un coin du carnaval !")
+
             elif found_npc.name.lower() == "vieux marchand":
                 # Révéler la bague si elle est présente et cachée
-                if "bague" in current_room.inventory.items and current_room.inventory.items["bague"]["hidden"]:
-                    current_room.inventory.reveal_item("bague")
-                    print("Le vieux marchand te montre une bague sur le sol du marché !")
-                
+                if "bague" in current_room.inventory.items:
+                    baguecachee = current_room.inventory.items["bague"]["hidden"]
+                    if baguecachee:
+                        current_room.inventory.reveal_item("bague")
+                        print("Le vieux marchand te montre une bague"
+                        "sur le sol du marché !")
+
             elif found_npc.name.lower() == "villageois":
-                self.defeat_checker.has_talked_to_villageois = True  # Mettre directement à True
+                self.defeat_checker.has_talked_to_villageois = True
                 print("\nDÉFAITE: Vous avez été infecté par le villageois!\n")
                 self.finished = True  # Terminer le jeu immédiatement
 
 
-        # Si le PNJ n'est pas dans la pièce actuelle, chercher dans toutes les pièces
+        # Si le PNJ n'est pas dans la pièce actuelle chercher ailleurs
         for room in self.rooms:
             for npc in room.inventory.npcs.values():
                 # Ne pas mentionner les PNJ invisibles
@@ -618,8 +495,8 @@ class Actions:
                     continue
 
         return False
-    
-                
+
+ 
 
 
     def give(self, list_of_words, number_of_parameters):
@@ -679,34 +556,7 @@ class Actions:
                     print("Erreur : La salle 'Château' n'existe pas.")
                 print(f"Le garde accepte votre {item_name}, mais"
                 "il attend un autre objet.")
-            
-            else: 
+
+            else:
                 print("\nLe garde n'est pas intéressé par cet objet.")
                 return True
-"""
-                if command_word == "give" and len(list_of_words) > 2:
-            item_name = list_of_words[2].lower()
-            if self.player.current_room.name.lower() == "Château":
-                if any(npc.name.lower() == "garde"
-                       for npc in self.player.current_room.inventory.npcs.values()):
-                    if item_name in ["potion", "pierre", "bague"]:
-                        if item_name in self.player.inventory.items:
-                            if item_name == "potion":
-                                print("\nVous donnez la potion au garde."
-                                        "Il l'examine et vous laisse passer.")
-                                #self.player.inventory.items.remove("potion")
-                                self.victory_checker.garde_convinced = True
-                            elif item_name in ["pierre", "bague"]:
-                                if all(item in self.player.inventory.items
-                                for item in ["pierre","bague"]):
-                                    print("\nVous montrez la pierre et la bague au garde.")
-                                    print("\nImpressionné et conquis, il vous laisse passer.")
-                                    self.victory_checker.garde_convinced = True
-                                print("\nLe garde demande des objets pour être convaincu.")
-                        print(f"\nVous n'avez pas {item_name} dans votre inventaire.")
-                    print("\nLe garde n'est pas intéressé par cet objet.")
-                print("\nIl n'y a pas de garde ici.")
-            print("")
-            if DEBUG:
-                print(f"DEBUG: Liste des mots de la commande: {list_of_words}")
-"""

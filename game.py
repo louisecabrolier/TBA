@@ -199,9 +199,6 @@ class Game:
         foret.inventory.add_item(mushroom, hidden=False)
         #foret.inventory["clef"] = key
         foret.inventory.add_item(key, hidden=False)
-        print("\nDEBUG - Après ajout de la clef:")
-        print("Clés dans l'inventaire:", list(foret.inventory.items.keys()))
-        print("Items dans l'inventaire:", [(k, v["item"].name) for k, v in foret.inventory.items.items()])
         #carnaval.inventory.items["tapis"] = {"item": tapis, "hidden": True} #vendeuse carnaval
         carnaval.inventory.add_item(tapis, hidden=True)
         #marche.inventory["bague"] = {"item": bague, "hidden": True} #marchand cachée au début
