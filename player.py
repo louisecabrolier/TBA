@@ -1,5 +1,6 @@
 """classe joueur""" # pylint: disable=too-many-instance-attributes
 from inventory import Inventory
+from item import Item
 
 class Player():
     """classe joueur"""
@@ -70,3 +71,12 @@ class Player():
             print("Votre inventaire contient :")
             for item_name, item in self.inventory.items.items():
                 print(f"- {item_name}: {item.description} ({item.poids} kg)")
+
+
+        
+
+    def talk_to_merchant(self):
+        self.has_spoken_to_merchant = True  # Met à jour l'état de la conversation
+        # Vous pouvez également rendre un objet révélé ici si nécessaire
+        # Exemple : current_room.inventory.items["potion"]["item"].revealed = True
+
