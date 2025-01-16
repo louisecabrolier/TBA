@@ -62,7 +62,12 @@ class Actions:
             self.player.history.append(self.player.current_room)
             self.player.current_room = self.entreecite
             self.door.close()
+            # Ajout des directions possibles
+            directions = [dir for dir, room in self.entreecite.exits.items() if room is not None]
+            print("\nSorties:", ",".join(directions))
             return True
+
+
 
         # Vérification des restrictions à l'entrée de la cité
         if self.player.current_room == self.entreecite and self.limited_exits:
@@ -83,6 +88,7 @@ class Actions:
         # Déplacement du joueur
         self.player.current_room = next_room
 
+
         # Gestion des cas spéciaux
         if next_room.name == "Endroit inconnu":
             self.defeat_checker.update_condition(True)
@@ -95,6 +101,11 @@ class Actions:
             self.limited_exits = False
         else:
             print(f"\nVous êtes dans {next_room.name}")
+
+        # Ajout des directions possibles
+        directions = [dir for dir, room in next_room.exits.items() if room is not None]
+        if directions:
+            print("\nSorties:", ", ".join(directions))
 
         return True
 
@@ -307,6 +318,8 @@ class Actions:
         """déposer un objet"""
         if len(list_of_words) < 2:
             print("Que voulez-vous déposer ?")
+            return
+
         item_name = list_of_words[1].lower()  # Normaliser le nom de l'item
         player = self.player
         current_room = player.current_room
