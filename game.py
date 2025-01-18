@@ -127,7 +127,7 @@ class Game:
         maisonsoussol.exits = {"N":None, "E":None, "S":None, "O":None, "U":maisonrdc, "D":None}
         alleeprincipale.exits = {"N":piedmonc,"E":marche,"S":entreecite, "O":piedmontagneouest}
         piedmontagneouest.exits = {"N" : mono, "E" : alleeprincipale, "S" : carnaval, "O" : None}
-        marche.exits = {"N" : maisonrdc, "E" : None, "S" : None, "O" : alleeprincipale}
+        marche.exits = {"N" : None, "E" : None, "S" : maisonrdc, "O" : alleeprincipale}
         piedmonc.exits = {"N" : mono, "E" : None, "S" : alleeprincipale, "O" : mono}
         mono.exits = {"N" : chateau, "E" : piedmonc, "S" : piedmontagneouest, "O" : None}
         chateau.exits = {"N" : None, "E":montagnesombre, "S" : None, "O" : None}
